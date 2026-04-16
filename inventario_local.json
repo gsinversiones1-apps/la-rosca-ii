@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "codigo_skv": "DW-01",
+    "nombre": "Tornillo Drywall Punta Fina",
+    "area": "Drywall",
+    "medida": "6 x 1\"",
+    "stock": 4997,
+    "precio_usd": 0.02,
+    "stock_minimo": 500
+  },
+  {
+    "id": 2,
+    "codigo_skv": "DW-02",
+    "nombre": "Tornillo Drywall Punta Broca",
+    "area": "Drywall",
+    "medida": "6 x 1 1/4\"",
+    "stock": 3500,
+    "precio_usd": 0.03,
+    "stock_minimo": 500
+  },
+  {
+    "id": 3,
+    "codigo_skv": "AU-01",
+    "nombre": "Hexagonal Grado 8 Cincado",
+    "area": "Automotriz",
+    "medida": "M10-1.25 x 30",
+    "stock": 130,
+    "precio_usd": 0.85,
+    "stock_minimo": 20
+  },
+  {
+    "id": 5,
+    "codigo_skv": "AL-01",
+    "nombre": "Allen Cilindrico Pavonado",
+    "area": "Allen",
+    "medida": "M6 x 20",
+    "stock": 200,
+    "precio_usd": 0.35,
+    "stock_minimo": 50
+  },
+  {
+    "id": 6,
+    "codigo_skv": "AL-02",
+    "nombre": "Allen Avellanado Inox",
+    "area": "Allen",
+    "medida": "1/4\" x 1\"",
+    "stock": 120,
+    "precio_usd": 0.6,
+    "stock_minimo": 30
+  },
+  {
+    "id": 7,
+    "codigo_skv": "GE-01",
+    "nombre": "Tirafondo para Madera",
+    "area": "General",
+    "medida": "1/4\" x 2\"",
+    "stock": 800,
+    "precio_usd": 0.15,
+    "stock_minimo": 100
+  },
+  {
+    "id": 8,
+    "codigo_skv": "GE-02",
+    "nombre": "Carruaje con Tuerca",
+    "area": "General",
+    "medida": "3/8\" x 3\"",
+    "stock": 450,
+    "precio_usd": 0.4,
+    "stock_minimo": 50
+  },
+  {
+    "id": 9,
+    "codigo_skv": "GE-03",
+    "nombre": "Arandela de Presion",
+    "area": "General",
+    "medida": "1/2\"",
+    "stock": 1000,
+    "precio_usd": 0.05,
+    "stock_minimo": 200
+  },
+  {
+    "id": 10,
+    "codigo_skv": "GE-04",
+    "nombre": "Tuerca Hexagonal Galv",
+    "area": "General",
+    "medida": "5/16\"",
+    "stock": 2000,
+    "precio_usd": 0.08,
+    "stock_minimo": 300
+  },
+  {
+    "id": 4,
+    "codigo_skv": "AU-02",
+    "nombre": "Tornillo de Camara",
+    "area": "Automotriz",
+    "medida": "M12-1.50 x 80",
+    "stock": 5,
+    "precio_usd": 4.5,
+    "stock_minimo": 10
+  }
+]

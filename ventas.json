@@ -1,0 +1,85 @@
+[
+  {
+    "fecha": "8/4/2026, 11:15:01 p. m.",
+    "codigo": "AU-01",
+    "descripcion": "Hexagonal Grado 8 Cincado",
+    "cantidad": 5,
+    "total": 4.25
+  },
+  {
+    "folio": "F-488992",
+    "fecha": "8/4/2026, 11:31:28 p. m.",
+    "items": [
+      {
+        "id": 1,
+        "codigo": "DW-01",
+        "nombre": "Tornillo Drywall Punta Fina",
+        "cantidad": 10,
+        "precio_unitario": 0.02,
+        "subtotal": 0.2
+      },
+      {
+        "id": 3,
+        "codigo": "AU-01",
+        "nombre": "Hexagonal Grado 8 Cincado",
+        "cantidad": 5,
+        "precio_unitario": 0.85,
+        "subtotal": 4.25
+      }
+    ],
+    "total": 4.45
+  },
+  {
+    "folio": "F-840275",
+    "fecha": "8/4/2026, 11:37:20 p. m.",
+    "items": [
+      {
+        "id": 1,
+        "codigo": "DW-01",
+        "nombre": "Tornillo Drywall Punta Fina",
+        "cantidad": 87,
+        "precio_unitario": 0.02,
+        "subtotal": 1.74
+      }
+    ],
+    "total": 1.74
+  },
+  {
+    "folio": "F-901232",
+    "fecha": "8/4/2026, 11:38:21 p. m.",
+    "items": [
+      {
+        "id": 3,
+        "codigo": "AU-01",
+        "nombre": "Hexagonal Grado 8 Cincado",
+        "cantidad": 20,
+        "precio_unitario": 0.85,
+        "subtotal": 17
+      },
+      {
+        "id": 6,
+        "codigo": "AL-02",
+        "nombre": "Allen Avellanado Inox",
+        "cantidad": 20,
+        "precio_unitario": 0.6,
+        "subtotal": 12
+      }
+    ],
+    "total": 29
+  },
+  {
+    "folio": "F-993386",
+    "fecha": "8/4/2026, 11:39:53 p. m.",
+    "items": [
+      {
+        "id": 1,
+        "codigo": "DW-01",
+        "nombre": "Tornillo Drywall Punta Fina",
+        "cantidad": 5,
+        "precio_unitario": 0.02,
+        "subtotal": 0.1
+      }
+    ],
+    "total": 0.1
+  }
+]
