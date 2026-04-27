@@ -71,7 +71,7 @@
 
 <aside class="fixed left-0 top-0 h-full w-64 flex flex-col z-40 bg-navy border-r border-industrial-gray shadow-xl">
     <div class="p-6 border-b border-industrial-gray">
-        <h1 class="text-lg font-bold text-white font-headline uppercase tracking-widest">HARDWARE <span class="text-gold">POS</span></h1>
+        <h1 id="sidebar-store-name" class="text-lg font-bold text-white font-headline uppercase tracking-widest">GLOBAL <span class="text-gold">POS</span></h1>
     </div>
     <nav class="flex-1 py-4 overflow-y-auto custom-scrollbar">
         <div class="px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">General</div>
@@ -114,7 +114,7 @@
             <button class="text-slate-400 hover:text-gold transition-colors">
                 <span class="material-symbols-outlined">menu</span>
             </button>
-            <div class="text-xl font-bold text-white tracking-tighter font-headline uppercase">LA ROSCA <span class="text-gold">II</span></div>
+            <div id="header-store-name" class="text-xl font-bold text-white tracking-tighter font-headline uppercase">FERRETERÍA <span class="text-gold">GLOBAL</span></div>
         </div>
         <div class="flex-1 max-w-xl mx-8">
             <div class="relative group">
@@ -612,7 +612,18 @@
     let cart = [];
     let currentClient = null;
     let tasaActual = 36.50;
-    const myTenantId = 'ROSC-001-VNZ';
+    let myTenantId = 'DEMO-GLOBAL-SAAS';
+    let storeName = 'Ferretería Global Demo';
+    
+    // Intentar cargar configuración desde URL o LocalStorage para modo SaaS
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('tenant')) myTenantId = urlParams.get('tenant');
+    if (urlParams.has('store')) storeName = urlParams.get('store');
+
+    // Actualizar UI con el nombre de la tienda
+    document.getElementById('header-store-name').innerHTML = storeName.replace(' ', ' <span class="text-gold">') + '</span>';
+    document.getElementById('sidebar-store-name').innerHTML = storeName.split(' ')[0] + ' <span class="text-gold">POS</span>';
+
     
     // Configuración persistente (RIF, Dirección, etc)
     let config = JSON.parse(localStorage.getItem('pos_config')) || {

@@ -1,6 +1,7 @@
 {
   "tasaBCV": 481.6989,
-  "tenant_id": "ROSC-001-VNZ",
-  "últimaActualización": "21/4/2026, 6:17:17 p. m.",
-  "fuente": "DolarAPI (Respaldo)"
+  "tenant_id": "DEMO-GLOBAL-SAAS",
+  "store_name": "Ferretería Global Demo",
+  "últimaActualización": "26/4/2026, 11:00:00 p. m.",
+  "fuente": "Configuración Maestra SaaS"
 }

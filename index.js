@@ -21,7 +21,8 @@ if (!supabaseUrl || !supabaseKey || supabaseUrl === 'tu_url_aqui' || supabaseKey
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 let tasaActual = 36.50; // Variable global para la tasa
-let myTenantId = 'ROSC-001-VNZ'; // ID de Tenant por defecto
+let myTenantId = 'DEMO-GLOBAL-SAAS'; // ID de Tenant por defecto para Demo Global
+let storeName = 'Ferretería Global Demo';
 
 // Carga inicial de configuración (Tenant ID y Tasa)
 if (fs.existsSync(configFilePath)) {
@@ -29,7 +30,8 @@ if (fs.existsSync(configFilePath)) {
         const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8'));
         if (config.tasaBCV) tasaActual = config.tasaBCV;
         if (config.tenant_id) myTenantId = config.tenant_id;
-        console.log(`[Config] Modo Multitenant activo: ${myTenantId}`);
+        if (config.store_name) storeName = config.store_name;
+        console.log(`[Config] Modo Multitenant activo: ${myTenantId} (${storeName})`);
     } catch (e) {
         console.error('Error al cargar config.json:', e.message);
     }
@@ -520,7 +522,8 @@ Muestra los hallazgos en una lista clara.`;
 }
 
 async function iniciarApp() {
-    console.log('--- Iniciando Sistema Tornillería La Rosca II ---');
+    console.log(`--- Iniciando Sistema SaaS: ${storeName} ---`);
+    console.log(`--- Tenant ID: ${myTenantId} ---`);
     await obtenerTasaBCV(); // Inicializar tasa al arrancar
 
     let salir = false;
