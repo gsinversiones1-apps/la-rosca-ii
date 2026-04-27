@@ -21,6 +21,19 @@ if (!supabaseUrl || !supabaseKey || supabaseUrl === 'tu_url_aqui' || supabaseKey
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 let tasaActual = 36.50; // Variable global para la tasa
+let myTenantId = 'ROSC-001-VNZ'; // ID de Tenant por defecto
+
+// Carga inicial de configuración (Tenant ID y Tasa)
+if (fs.existsSync(configFilePath)) {
+    try {
+        const config = JSON.parse(fs.readFileSync(configFilePath, 'utf8'));
+        if (config.tasaBCV) tasaActual = config.tasaBCV;
+        if (config.tenant_id) myTenantId = config.tenant_id;
+        console.log(`[Config] Modo Multitenant activo: ${myTenantId}`);
+    } catch (e) {
+        console.error('Error al cargar config.json:', e.message);
+    }
+}
 
 // --- Orquestación de IA (Cerebro: Gemini) ---
 async function getAIResponse(prompt, data = "") {
@@ -97,7 +110,9 @@ async function obtenerTasaBCV() {
             const valor = await consultarAPIDolar(fuente.url, fuente.parser);
             if (valor) {
                 tasa = parseFloat(valor);
+                const configExistente = fs.existsSync(configFilePath) ? JSON.parse(fs.readFileSync(configFilePath, 'utf8')) : {};
                 const config = {
+                    ...configExistente,
                     tasaBCV: tasa,
                     últimaActualización: new Date().toLocaleString(),
                     fuente: fuente.nombre
@@ -133,9 +148,14 @@ async function actualizarTasaManual() {
         return;
     }
 
-    const config = { tasaBCV: tasaNum, últimaActualización: new Date().toLocaleString() };
+    const configExistente = fs.existsSync(configFilePath) ? JSON.parse(fs.readFileSync(configFilePath, 'utf8')) : {};
+    const config = {
+        ...configExistente,
+        tasaBCV: tasaNum,
+        últimaActualización: new Date().toLocaleString()
+    };
     fs.writeFileSync(configFilePath, JSON.stringify(config, null, 2));
-    console.log(`✅ Tasa actualizada a ${tasaNum} Bs/USD.`);
+    console.log(`✅ Tasa actualizada a ${tasaNum} Bs/USD (Tenant: ${myTenantId}).`);
 }
 
 // Función para mostrar la tabla de forma consistente
@@ -164,6 +184,7 @@ async function listarTornillos() {
         const { data, error } = await supabase
             .from('productos')
             .select('*')
+            .eq('tenant_id', myTenantId)
             .limit(10);
 
         if (error) throw error;
@@ -312,7 +333,7 @@ async function simularVenta() {
 
         // 3. Finalizar Venta y Persistencia
         const totalVentaUSD = carrito.reduce((sum, item) => sum + item.subtotal, 0);
-        const totalVentaBS = totalVentaUSD * tasaBCV;
+        const totalVentaBS = totalVentaUSD * tasaActual;
         const folio = `F-${Date.now().toString().slice(-6)}`;
         const fecha = new Date().toLocaleString('es-VE');
 

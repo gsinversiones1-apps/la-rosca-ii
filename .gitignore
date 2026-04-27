@@ -1,2 +1,15 @@
-node_modules
+# Dependencies
+node_modules/
+
+# Environment variables
 .env
+
+# Local data / Backups
+inventario_local.json
+ventas.json
+
+# IDE / System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
