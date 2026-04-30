@@ -1,0 +1,48 @@
+/**
+ * Componente Sidebar para el SaaS
+ */
+
+export const renderSidebar = (storeName = "GLOBAL POS") => {
+    return `
+    <aside class="fixed left-0 top-0 h-full w-64 flex flex-col z-40 bg-navy border-r border-industrial-gray shadow-xl">
+        <div class="p-6 border-b border-industrial-gray">
+            <h1 id="sidebar-store-name" class="text-lg font-bold text-white font-headline uppercase tracking-widest">
+                ${storeName.split(' ')[0]} <span class="text-gold">POS</span>
+            </h1>
+        </div>
+        <nav class="flex-1 py-4 overflow-y-auto custom-scrollbar">
+            <div class="px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">General</div>
+            
+            <button id="nav-dashboard" class="w-full text-slate-400 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all">
+                <span class="material-symbols-outlined">dashboard</span> Dashboard
+            </button>
+
+            <button id="nav-inventory" class="w-full text-slate-400 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all">
+                <span class="material-symbols-outlined">inventory_2</span> Inventario
+            </button>
+            
+            <button id="nav-pos" class="w-full text-slate-400 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all">
+                <span class="material-symbols-outlined">point_of_sale</span> Ventas (POS)
+            </button>
+            
+            <button id="nav-clients" class="w-full text-slate-400 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all">
+                <span class="material-symbols-outlined">group</span> Clientes
+            </button>
+            
+            <a id="btn-open-settings" class="text-slate-500 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all mt-10 cursor-pointer">
+                <span class="material-symbols-outlined text-sm text-gold">settings</span> Configuración
+            </a>
+            
+            <div class="px-4 mt-6 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest border-t border-industrial-gray pt-6">Estado del Sistema</div>
+            <div class="px-4 py-4">
+                <div id="status-container">
+                    <div class="flex items-center gap-2">
+                        <div id="db-status-dot" class="w-2 h-2 rounded-full bg-red-500"></div>
+                        <span id="db-status-text" class="text-[9px] uppercase tracking-widest text-slate-500">Conectando...</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </aside>
+    `;
+};
