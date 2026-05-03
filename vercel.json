@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "name": "tornilleria-la-rosca-saas",
-  "builds": [
-    { "src": "index.html", "use": "@vercel/static" }
-  ],
-  "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
+  "name": "la-rosca-ii",
+  "installCommand": "npm install",
+  "buildCommand": null,
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
