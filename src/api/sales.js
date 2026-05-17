@@ -47,10 +47,21 @@ export const saveSale = async (saleData) => {
             savedSale = data;
 
         } catch (error) {
-            // Si el error viene de nuestro Trigger de Stock Insuficiente, no lo tratamos como error de red.
+            // Log detallado para auditoría
+            console.error('[API Ventas] Error de Supabase al guardar:', error);
+
+            // Si el error viene de nuestro Trigger de Stock Insuficiente
             if (error.message && error.message.includes('INSUFFICIENT_STOCK')) {
                 throw new Error('Stock insuficiente en base de datos. Transacción cancelada.');
             }
+            
+            // Si el error es de base de datos (Ej: Falta una columna o error de sintaxis)
+            // Los errores de Postgres en Supabase suelen tener un código alfanumérico (ej: '42703' es Undefined Column)
+            if (error.code) {
+                console.error(`[API Ventas] Error SQL Detectado (Código ${error.code}):`, error.message || error.details);
+                throw error; // Lanzamos el error hacia la UI para que se muestre el Toast rojo
+            }
+
             console.warn('Fallo guardando online, cambiando a offline mode', error);
             isOffline = true;
         }
@@ -59,9 +70,9 @@ export const saveSale = async (saleData) => {
     // 2. Fallback Offline: Guardar en Sync Queue (IndexedDB)
     if (isOffline) {
         console.log('Guardando venta en Sync Queue local...');
-        salePayload.id = 'OFFLINE-' + Date.now(); // ID temporal
-        await enqueueSale(salePayload);
-        savedSale = salePayload;
+        saleData.id = 'OFFLINE-' + Date.now(); // ID temporal
+        await enqueueSale(saleData);
+        savedSale = saleData;
 
         // Intentar registrar el evento Background Sync si el Service Worker lo soporta
         if ('serviceWorker' in navigator && 'SyncManager' in window) {
