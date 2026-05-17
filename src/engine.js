@@ -403,7 +403,8 @@ async function handleCheckout(isConsumidorFinal = false) {
                 });
             }
         } else {
-            alert('❌ Error al procesar la venta');
+            const errorMsg = error.message || error.details || JSON.stringify(error);
+            alert('❌ Error al procesar la venta:\n' + errorMsg);
         }
     }
 }
