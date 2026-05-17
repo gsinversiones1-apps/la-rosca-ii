@@ -125,7 +125,7 @@ export const renderCheckoutModal = (totals) => {
                 <p class="text-[9px] text-slate-500 text-center uppercase tracking-widest">
                     <span class="text-gold font-bold">*</span> Obligatorio por ley — Toda factura debe identificar al cliente (SENIAT)
                 </p>
-                <button id="btn-confirm-checkout" class="w-full bg-gold text-navy py-4 text-xs font-black uppercase tracking-[0.1em] shadow-[0_4px_0_#B8962F] active:translate-y-1 active:shadow-none transition-all">
+                <button id="btn-confirm-checkout" disabled class="w-full bg-gold text-navy py-4 text-xs font-black uppercase tracking-[0.1em] shadow-[0_4px_0_#B8962F] active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                     CONFIRMAR PAGO Y EMITIR FACTURA
                 </button>
             </div>

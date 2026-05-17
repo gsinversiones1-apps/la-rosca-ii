@@ -502,6 +502,10 @@ function setupGlobalEvents() {
             document.getElementById('checkout-client-search').parentElement.classList.remove('hidden');
             document.getElementById('checkout-client-search').value = '';
             document.getElementById('checkout-new-client-form').classList.add('hidden');
+            
+            // Deshabilitar botón si se limpia el cliente
+            const btnConfirm = document.getElementById('btn-confirm-checkout');
+            if (btnConfirm) btnConfirm.setAttribute('disabled', 'true');
         }
         if (e.target.closest('.checkout-client-option')) {
             const clientId = e.target.closest('.checkout-client-option').dataset.id;
@@ -518,6 +522,10 @@ function setupGlobalEvents() {
                 // Ocultar mensaje de error si existía
                 const errBox = document.getElementById('checkout-validation-error');
                 if (errBox) errBox.classList.add('hidden');
+                
+                // Habilitar el botón de Confirmar Pago
+                const btnConfirm = document.getElementById('btn-confirm-checkout');
+                if (btnConfirm) btnConfirm.removeAttribute('disabled');
             }
         }
         if (e.target.closest('#btn-checkout-add-new')) {
@@ -526,6 +534,14 @@ function setupGlobalEvents() {
             document.getElementById('checkout-new-client-form').classList.remove('hidden');
             document.getElementById('checkout-new-rif').value = searchVal;
             document.getElementById('checkout-new-rif').focus();
+            
+            // Habilitar botón porque el usuario va a crear un cliente
+            const btnConfirm = document.getElementById('btn-confirm-checkout');
+            if (btnConfirm) btnConfirm.removeAttribute('disabled');
+            
+            // Ocultar error si estaba
+            const errBox = document.getElementById('checkout-validation-error');
+            if (errBox) errBox.classList.add('hidden');
         }
 
         // Modales (Cliente y Factura)
