@@ -269,54 +269,53 @@ function renderInventoryTable(products = GlobalState.allProducts) {
 }
 
 async function handleCheckout(isConsumidorFinal = false) {
-    const metodoPagoSelect = document.getElementById('checkout-metodo-pago');
-    const metodoPago = metodoPagoSelect ? metodoPagoSelect.value : 'PAGO MOVIL';
-    
-    const totals = calculateTotals(GlobalState.tasaActual, metodoPago);
-    if (GlobalState.cart.length === 0) return;
+    try {
+        const metodoPagoSelect = document.getElementById('checkout-metodo-pago');
+        const metodoPago = metodoPagoSelect ? metodoPagoSelect.value : 'PAGO MOVIL';
+        
+        const totals = calculateTotals(GlobalState.tasaActual, metodoPago);
+        if (GlobalState.cart.length === 0) {
+            alert('El carrito está vacío.');
+            return;
+        }
 
-    let clientId = null;
-    let clientResolved = false;
+        let clientId = null;
+        let clientResolved = false;
 
-    if (isConsumidorFinal) {
-        clientResolved = true; // Bypasses specific client validation
-    } else if (GlobalState.currentClient) {
-        clientId = GlobalState.currentClient.id;
-        clientResolved = true;
-    } else {
-        const newClientForm = document.getElementById('checkout-new-client-form');
-        if (newClientForm && !newClientForm.classList.contains('hidden')) {
-            const formData = new FormData(newClientForm);
-            const clientData = Object.fromEntries(formData.entries());
-            if (clientData.nombre && clientData.rif) {
-                try {
+        if (isConsumidorFinal) {
+            clientResolved = true; // Bypasses specific client validation
+        } else if (GlobalState.currentClient) {
+            clientId = GlobalState.currentClient.id;
+            clientResolved = true;
+        } else {
+            const newClientForm = document.getElementById('checkout-new-client-form');
+            if (newClientForm && !newClientForm.classList.contains('hidden')) {
+                const formData = new FormData(newClientForm);
+                const clientData = Object.fromEntries(formData.entries());
+                if (clientData.nombre && clientData.rif) {
                     const newClient = await createClient(clientData);
                     const updatedClients = await getClients();
                     updateState('allClients', updatedClients);
                     updateState('currentClient', newClient);
                     clientId = newClient.id;
                     clientResolved = true;
-                } catch (err) {
-                    console.error('Error creando cliente:', err);
                 }
             }
         }
-    }
 
-    // BLOQUEO LEGAL: No proceder sin datos del cliente
-    if (!clientResolved) {
-        const errBox = document.getElementById('checkout-validation-error');
-        if (errBox) {
-            errBox.classList.remove('hidden');
-            errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // BLOQUEO LEGAL: No proceder sin datos del cliente
+        if (!clientResolved) {
+            const errBox = document.getElementById('checkout-validation-error');
+            if (errBox) {
+                errBox.classList.remove('hidden');
+                errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return; // Detener aquí
+        } else {
+            const errBox = document.getElementById('checkout-validation-error');
+            if (errBox) errBox.classList.add('hidden');
         }
-        return; // Detener aquí
-    } else {
-        const errBox = document.getElementById('checkout-validation-error');
-        if (errBox) errBox.classList.add('hidden');
-    }
 
-    try {
         updateStatus('Procesando...', 'yellow');
         
         const saleData = {
@@ -358,7 +357,7 @@ async function handleCheckout(isConsumidorFinal = false) {
         
         updateStatus('Conectado', 'green');
     } catch (e) {
-        console.error('Error en Checkout:', e);
+        console.error('Error FATAL en Checkout:', e);
         updateStatus('Conectado', 'green'); // Limpiar estado de procesando
         
         if (e.message && e.message.includes('Stock insuficiente')) {
@@ -406,7 +405,7 @@ async function handleCheckout(isConsumidorFinal = false) {
                 });
             }
         } else {
-            const errorMsg = error.message || error.details || JSON.stringify(error);
+            const errorMsg = e.message || e.details || JSON.stringify(e);
             alert('❌ Error al procesar la venta:\n' + errorMsg);
         }
     }
