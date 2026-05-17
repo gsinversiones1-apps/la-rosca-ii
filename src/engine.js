@@ -311,6 +311,9 @@ async function handleCheckout(isConsumidorFinal = false) {
             errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         return; // Detener aquí
+    } else {
+        const errBox = document.getElementById('checkout-validation-error');
+        if (errBox) errBox.classList.add('hidden');
     }
 
     try {
@@ -511,6 +514,10 @@ function setupGlobalEvents() {
                 document.getElementById('checkout-client-search').parentElement.classList.add('hidden');
                 document.getElementById('checkout-client-results').classList.add('hidden');
                 document.getElementById('checkout-new-client-form').classList.add('hidden');
+                
+                // Ocultar mensaje de error si existía
+                const errBox = document.getElementById('checkout-validation-error');
+                if (errBox) errBox.classList.add('hidden');
             }
         }
         if (e.target.closest('#btn-checkout-add-new')) {

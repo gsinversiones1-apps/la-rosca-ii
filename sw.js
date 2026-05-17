@@ -1,7 +1,7 @@
 // sw.js - CONNEXAS Offline-First Architecture
 
-const CACHE_NAME = 'connexas-app-cache-v5';
-const DATA_CACHE = 'connexas-data-cache-v5';
+const CACHE_NAME = 'connexas-app-cache-v6';
+const DATA_CACHE = 'connexas-data-cache-v6';
 
 // 1. Archivos críticos que siempre deben funcionar offline
 const ASSETS_A_CACHEAR = [
