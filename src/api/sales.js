@@ -10,14 +10,27 @@ export const saveSale = async (saleData) => {
     // id, producto_id, cantidad, tasa_dia, total_bs, fecha_venta, tenant_id
 
     // La venta se guarda como N filas, una por producto en el carrito
-    const rows = saleData.items.map(item => ({
-        tenant_id: GlobalState.myTenantId,
-        producto_id: item.id,
-        cantidad: item.cantidad,
-        tasa_dia: GlobalState.tasaActual,
-        total_bs: item.precio_usd * item.cantidad * GlobalState.tasaActual,
-        fecha_venta: new Date().toISOString()
-    }));
+    const rows = saleData.items.map(item => {
+        const itemSubtotal = item.precio_usd * item.cantidad;
+        const itemIva = itemSubtotal * (GlobalState.config.iva / 100);
+        let itemIgtf = 0;
+        
+        if (saleData.metodoPago === 'DIVISAS') {
+            itemIgtf = (itemSubtotal + itemIva) * 0.03;
+        }
+
+        return {
+            producto_id: item.id,
+            cantidad: item.cantidad,
+            tasa_dia: GlobalState.tasaActual,
+            total_bs: (itemSubtotal + itemIva + itemIgtf) * GlobalState.tasaActual,
+            fecha_venta: new Date().toISOString(),
+            cliente_id: saleData.clientId,
+            metodo_pago: saleData.metodoPago,
+            iva_amount: itemIva,
+            igtf_amount: itemIgtf
+        };
+    });
 
     let savedSale = null;
     let isOffline = !navigator.onLine;
@@ -34,6 +47,10 @@ export const saveSale = async (saleData) => {
             savedSale = data;
 
         } catch (error) {
+            // Si el error viene de nuestro Trigger de Stock Insuficiente, no lo tratamos como error de red.
+            if (error.message && error.message.includes('INSUFFICIENT_STOCK')) {
+                throw new Error('Stock insuficiente en base de datos. Transacción cancelada.');
+            }
             console.warn('Fallo guardando online, cambiando a offline mode', error);
             isOffline = true;
         }

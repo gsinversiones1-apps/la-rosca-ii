@@ -7,7 +7,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const demoProducts = [
     {
-        tenant_id: 'DEMO-GLOBAL-SAAS',
+        tenant_id: '00000000-0000-0000-0000-000000000001',
         nombre: 'Tornillo Allen Cilíndrico 1/4 x 1',
         codigo_skv: 'ALL-001',
         precio_usd: 0.25,
@@ -16,7 +16,7 @@ const demoProducts = [
         medida: '1/4 x 1'
     },
     {
-        tenant_id: 'DEMO-GLOBAL-SAAS',
+        tenant_id: '00000000-0000-0000-0000-000000000001',
         nombre: 'Tornillo Drywall 6 x 1',
         codigo_skv: 'DRY-002',
         precio_usd: 0.05,
@@ -25,7 +25,7 @@ const demoProducts = [
         medida: '6 x 1'
     },
     {
-        tenant_id: 'DEMO-GLOBAL-SAAS',
+        tenant_id: '00000000-0000-0000-0000-000000000001',
         nombre: 'Arandela de Presión 3/8',
         codigo_skv: 'ARA-003',
         precio_usd: 0.10,

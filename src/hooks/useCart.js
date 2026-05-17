@@ -53,13 +53,19 @@ export const useCart = () => {
         updateState('cart', []);
     };
 
-    const calculateTotals = (tasa) => {
+    const calculateTotals = (tasa, metodoPago = 'PAGO MOVIL') => {
         const subtotal = GlobalState.cart.reduce((acc, item) => acc + (item.precio_usd * item.cantidad), 0);
         const iva = subtotal * (GlobalState.config.iva / 100);
-        const totalUsd = subtotal + iva;
+        
+        let igtf = 0;
+        if (metodoPago === 'DIVISAS') {
+            igtf = (subtotal + iva) * 0.03; // IGTF es 3% sobre el monto en divisas pagado
+        }
+        
+        const totalUsd = subtotal + iva + igtf;
         const totalBs = totalUsd * tasa;
         
-        return { subtotal, iva, totalUsd, totalBs };
+        return { subtotal, iva, igtf, totalUsd, totalBs, metodoPago };
     };
 
     return { addToCart, removeFromCart, clearCart, calculateTotals };

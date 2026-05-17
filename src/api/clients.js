@@ -8,7 +8,6 @@ export const getClients = async () => {
     const { data, error } = await supabase
         .from('clientes')
         .select('*')
-        .eq('tenant_id', GlobalState.myTenantId)
         .order('nombre', { ascending: true });
     
     if (error) throw error;
@@ -20,8 +19,7 @@ export const createClient = async (clientData) => {
         nombre: clientData.nombre || '',
         apellido: clientData.apellido || '',
         cedula: clientData.rif || clientData.cedula || '',
-        direccion: clientData.direccion || null,
-        tenant_id: GlobalState.myTenantId
+        direccion: clientData.direccion || null
     };
 
     // Usar upsert: si ya existe la cédula, actualiza y retorna el registro

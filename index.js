@@ -21,7 +21,7 @@ if (!supabaseUrl || !supabaseKey || supabaseUrl === 'tu_url_aqui' || supabaseKey
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 let tasaActual = 36.50; // Variable global para la tasa
-let myTenantId = 'DEMO-GLOBAL-SAAS'; // ID de Tenant por defecto para Demo Global
+let myTenantId = '00000000-0000-0000-0000-000000000001'; // ID de Tenant UUID para CLI
 let storeName = 'Ferretería Global Demo';
 
 // Carga inicial de configuración (Tenant ID y Tasa)

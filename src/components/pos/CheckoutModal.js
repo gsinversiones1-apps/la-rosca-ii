@@ -19,15 +19,42 @@ export const renderCheckoutModal = (totals) => {
                 </button>
             </div>
 
-            <div class="p-6 space-y-6">
-                <!-- Resumen de Totales -->
-                <div class="flex justify-between items-end bg-dark-gray p-4 border border-industrial-gray">
-                    <div>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Total a Pagar</p>
-                        <p class="text-2xl font-headline font-black text-gold">$${formatCurrency(totals.totalUsd)}</p>
+            <div class="p-6 space-y-4">
+                <!-- Método de Pago -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Método de Pago</label>
+                    <select id="checkout-metodo-pago" class="w-full bg-dark-gray border border-industrial-gray text-white text-sm p-3 focus:border-gold outline-none uppercase font-bold">
+                        <option value="PAGO MOVIL">Pago Móvil</option>
+                        <option value="PUNTO DE VENTA">Punto de Venta</option>
+                        <option value="EFECTIVO BS">Efectivo Bs</option>
+                        <option value="DIVISAS">Divisas (USD) + 3% IGTF</option>
+                    </select>
+                </div>
+
+                <!-- Resumen de Totales Fiscales -->
+                <div class="bg-dark-gray p-4 border border-industrial-gray space-y-2" id="checkout-fiscal-breakdown">
+                    <div class="flex justify-between text-xs text-slate-400">
+                        <span>Subtotal</span>
+                        <span>$${formatCurrency(totals.subtotal)}</span>
                     </div>
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-white">${formatCurrency(totals.totalBs)} Bs.</p>
+                    <div class="flex justify-between text-xs text-slate-400">
+                        <span>IVA (16%)</span>
+                        <span>$${formatCurrency(totals.iva)}</span>
+                    </div>
+                    ${totals.igtf > 0 ? `
+                    <div class="flex justify-between text-xs text-red-400">
+                        <span>IGTF (3%)</span>
+                        <span>$${formatCurrency(totals.igtf)}</span>
+                    </div>
+                    ` : ''}
+                    <div class="flex justify-between items-end border-t border-industrial-gray pt-2 mt-2">
+                        <div>
+                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Total a Pagar</p>
+                            <p class="text-2xl font-headline font-black text-gold">$${formatCurrency(totals.totalUsd)}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-white">${formatCurrency(totals.totalBs)} Bs.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -50,7 +77,6 @@ export const renderCheckoutModal = (totals) => {
                     </div>
                 </div>
 
-                <!-- Cliente Seleccionado (Visible cuando se elige uno) -->
                 <div id="checkout-selected-client-box" class="hidden bg-gold/10 border border-gold p-4 relative">
                     <button id="btn-clear-checkout-client" class="absolute top-2 right-2 text-gold hover:text-white">
                         <span class="material-symbols-outlined text-sm">close</span>
@@ -59,6 +85,10 @@ export const renderCheckoutModal = (totals) => {
                     <p id="checkout-selected-name" class="text-sm font-black text-white uppercase"></p>
                     <p id="checkout-selected-rif" class="text-xs text-slate-400 font-bold uppercase"></p>
                 </div>
+
+                <button id="btn-checkout-consumidor-final" class="w-full text-center border border-dashed border-slate-600 p-2 text-xs font-bold text-slate-400 hover:text-white hover:border-white transition-colors uppercase">
+                    + FACTURAR COMO CONSUMIDOR FINAL
+                </button>
                 
                 <!-- Formulario Rápido Cliente Nuevo (Oculto por defecto) -->
                 <form id="checkout-new-client-form" class="hidden space-y-3 bg-dark-gray p-4 border border-industrial-gray border-dashed">
