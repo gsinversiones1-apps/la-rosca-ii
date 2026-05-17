@@ -8,6 +8,7 @@ export const GlobalState = {
     cart: [],
     currentClient: null,
     tasaActual: 36.50,
+    cartMetodoPago: 'PAGO MOVIL',
     myTenantId: 'ROSC-001-VNZ',
     storeName: 'Tornillería La Rosca II',
     

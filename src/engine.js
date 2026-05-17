@@ -433,6 +433,16 @@ function setupGlobalEvents() {
             handleCheckout(true);
         }
 
+        // Cambio de método de pago en Sidebar del Carrito
+        if (e.target.closest('#btn-metodo-pago-bs')) {
+            updateState('cartMetodoPago', 'PAGO MOVIL');
+            updateCartUI();
+        }
+        if (e.target.closest('#btn-metodo-pago-usd')) {
+            updateState('cartMetodoPago', 'DIVISAS');
+            updateCartUI();
+        }
+
         // Carrito y POS
         if (e.target.closest('.add-to-cart')) {
             const id = e.target.closest('.add-to-cart').dataset.id;

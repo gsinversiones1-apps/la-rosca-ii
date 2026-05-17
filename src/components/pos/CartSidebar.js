@@ -8,7 +8,7 @@ import { useCart } from '../../hooks/useCart.js';
 
 export const renderCartSidebar = () => {
     const { calculateTotals } = useCart();
-    const { subtotal, iva, totalUsd, totalBs } = calculateTotals(GlobalState.tasaActual);
+    const { subtotal, iva, igtf, totalUsd, totalBs } = calculateTotals(GlobalState.tasaActual, GlobalState.cartMetodoPago);
     
     return `
     <aside class="fixed right-0 top-0 h-full w-80 bg-navy border-l border-industrial-gray shadow-2xl z-40 flex flex-col">
@@ -18,8 +18,6 @@ export const renderCartSidebar = () => {
             </h3>
             <span class="bg-gold text-navy text-[10px] font-black px-2 py-0.5 rounded-full">${GlobalState.cart.length}</span>
         </div>
-
-        <!-- SECCIÓN ELIMINADA: El cliente ahora se selecciona al finalizar la venta en el Checkout Modal -->
 
         <!-- ITEMS -->
         <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
@@ -33,6 +31,17 @@ export const renderCartSidebar = () => {
 
         <!-- TOTALES Y CHECKOUT -->
         <div class="p-6 bg-dark-gray border-t border-industrial-gray space-y-4">
+            
+            <!-- Selector de Divisas/Bolívares (IGTF) -->
+            <div class="bg-navy p-2 flex border border-industrial-gray rounded-sm mb-2">
+                <button id="btn-metodo-pago-bs" class="flex-1 text-[10px] font-bold uppercase tracking-wider py-1.5 transition-colors ${GlobalState.cartMetodoPago !== 'DIVISAS' ? 'bg-gold text-navy shadow-sm' : 'text-slate-400 hover:text-white'}">
+                    Bolívares
+                </button>
+                <button id="btn-metodo-pago-usd" class="flex-1 text-[10px] font-bold uppercase tracking-wider py-1.5 transition-colors flex items-center justify-center gap-1 ${GlobalState.cartMetodoPago === 'DIVISAS' ? 'bg-green-500 text-navy shadow-sm' : 'text-slate-400 hover:text-green-400'}">
+                    Divisas <span class="text-[8px] opacity-75">(+3%)</span>
+                </button>
+            </div>
+
             <div class="space-y-2 border-b border-industrial-gray pb-4">
                 <div class="flex justify-between text-[10px] text-slate-400 uppercase font-bold">
                     <span>Subtotal</span>
@@ -42,6 +51,12 @@ export const renderCartSidebar = () => {
                     <span>IVA (${GlobalState.config.iva}%)</span>
                     <span>$${formatCurrency(iva)}</span>
                 </div>
+                ${igtf > 0 ? `
+                <div class="flex justify-between text-[10px] text-red-400 uppercase font-bold">
+                    <span>IGTF (3%)</span>
+                    <span>$${formatCurrency(igtf)}</span>
+                </div>
+                ` : ''}
                 <div class="flex justify-between text-gold font-headline font-black text-lg pt-2 border-t border-white/5">
                     <span>TOTAL USD</span>
                     <span>$${formatCurrency(totalUsd)}</span>
