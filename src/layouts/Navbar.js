@@ -29,7 +29,7 @@ export const renderNavbar = (storeName, tasa, user = null, userRole = '') => {
         <div class="flex-1 max-w-xl mx-8">
             <div class="relative group">
                 <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-500 group-focus-within:text-gold transition-colors">search</span>
-                <input id="search-input" class="w-full bg-background border border-industrial-gray focus:border-gold focus:ring-0 rounded-sm pl-10 pr-4 py-2 text-slate-200 text-xs uppercase tracking-wide transition-all" placeholder="BUSCAR PRODUCTO O SKU..." type="text"/>
+                <input id="search-input" class="w-full bg-white border border-industrial-gray focus:border-gold focus:ring-0 rounded-sm pl-10 pr-4 py-2 text-black font-bold text-xs uppercase tracking-wide transition-all placeholder-slate-500" placeholder="BUSCAR PRODUCTO O SKU..." type="text"/>
             </div>
         </div>
         <div class="flex items-center gap-4">
