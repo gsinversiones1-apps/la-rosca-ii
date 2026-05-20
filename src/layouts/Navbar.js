@@ -34,7 +34,7 @@ export const renderNavbar = (storeName, tasa, user = null, userRole = '') => {
         </div>
         
         <!-- Buscador Responsivo: En móvil se posiciona de forma absoluta abajo del header al desplegarse -->
-        <div id="search-container" class="hidden md:block flex-1 max-w-xs md:max-w-xl mx-2 md:mx-8 absolute md:relative top-full md:top-auto inset-x-0 md:inset-x-auto w-full md:w-auto bg-dark-gray md:bg-transparent px-4 py-2 md:p-0 border-b md:border-b-0 border-industrial-gray z-20">
+        <div id="search-container" class="hidden md:block flex-1 max-w-xs md:max-w-xl mx-2 md:mx-8 absolute md:relative top-full md:top-auto inset-x-0 md:inset-x-auto md:w-auto bg-dark-gray md:bg-transparent px-4 py-2 md:p-0 border-b md:border-b-0 border-industrial-gray z-20">
             <div class="relative group">
                 <span class="material-symbols-outlined absolute left-2.5 top-2 md:top-2.5 text-slate-500 group-focus-within:text-gold transition-colors text-sm md:text-base">search</span>
                 <input id="search-input" class="w-full bg-white border border-industrial-gray focus:border-gold focus:ring-0 rounded-sm pl-8 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-black font-bold text-xs uppercase tracking-wide transition-all placeholder-slate-500" placeholder="BUSCAR PRODUCTO O SKU..." type="text"/>
