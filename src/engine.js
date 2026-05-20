@@ -675,6 +675,11 @@ function setupGlobalEvents() {
             return;
         }
 
+        if (e.target.closest('#btn-close-sidebar')) {
+            closeDrawers();
+            return;
+        }
+
         if (e.target.closest('#btn-mobile-cart')) {
             document.getElementById('cart-sidebar').classList.toggle('translate-x-full');
             const overlay = document.getElementById('mobile-overlay');
