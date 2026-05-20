@@ -121,8 +121,7 @@ async function initApp() {
             
             // Si estábamos offline y ya cargó la UI local, refrescamos las vistas silenciosamente
             if (localProducts && localProducts.length > 0) {
-                renderProductsInGrid();
-                renderInventoryTable();
+                applyFilters();
             } else {
                 navigate('pos');
             }
@@ -348,10 +347,10 @@ export function navigate(page) {
 
     if (page === 'pos') {
         contentArea.innerHTML = renderPOSPage();
-        renderProductsInGrid();
+        applyFilters();
     } else if (page === 'inventory') {
         contentArea.innerHTML = renderInventoryPage(GlobalState.userRole);
-        renderInventoryTable();
+        applyFilters();
     } else if (page === 'dashboard') {
         contentArea.innerHTML = renderDashboardPage();
         loadDashboardData();
@@ -594,7 +593,7 @@ async function handleCheckout(isConsumidorFinal = false) {
         
         const products = await getProductsByTenant(GlobalState.myTenantId);
         updateState('allProducts', products);
-        renderProductsInGrid();
+        applyFilters();
         
         updateStatus('Conectado', 'green');
     } catch (e) {
@@ -659,7 +658,7 @@ function setupGlobalEvents() {
     
     // Escuchar eventos globales para actualizaciones UI
     window.addEventListener('sync-queue-updated', updateSyncBadge);
-    window.addEventListener('local-stock-updated', renderProductsInGrid);
+    window.addEventListener('local-stock-updated', applyFilters);
 
     document.addEventListener('click', async (e) => {
         // --- Lógica de Drawers Responsivos ---
@@ -762,7 +761,7 @@ function setupGlobalEvents() {
         if (e.target.closest('.add-to-cart')) {
             const id = e.target.closest('.add-to-cart').dataset.id;
             const p = GlobalState.allProducts.find(x => x.id == id);
-            if (p) { addToCart(p); updateCartUI(); renderProductsInGrid(); }
+            if (p) { addToCart(p); updateCartUI(); applyFilters(); }
         }
         if (e.target.closest('.add-item')) {
             const id = e.target.closest('.add-item').dataset.id;
@@ -772,10 +771,10 @@ function setupGlobalEvents() {
         if (e.target.closest('.remove-item')) {
             removeFromCart(e.target.closest('.remove-item').dataset.id);
             updateCartUI();
-            renderProductsInGrid();
+            applyFilters();
         }
         if (e.target.closest('#btn-clear-cart')) {
-            clearCart(); updateCartUI(); renderProductsInGrid();
+            clearCart(); updateCartUI(); applyFilters();
         }
 
         // Checkout
