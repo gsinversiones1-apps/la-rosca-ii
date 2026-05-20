@@ -261,40 +261,59 @@ function getMatchScore(product, queryTerms) {
     return totalScore;
 }
 
+const applyFilters = () => {
+    const searchInput = document.getElementById('search-input');
+    const categorySelect = document.getElementById('filter-category');
+    
+    const query = searchInput ? searchInput.value.trim() : '';
+    const category = categorySelect ? categorySelect.value : 'all';
+    
+    const resultsCount = document.getElementById('results-count');
+
+    // 1. Filtrar primero por categoría (si no es 'all')
+    let filteredProducts = GlobalState.allProducts;
+    if (category !== 'all') {
+        const lowerCat = category.toLowerCase().trim();
+        filteredProducts = filteredProducts.filter(p => 
+            p.area && p.area.toLowerCase().trim() === lowerCat
+        );
+    }
+
+    // 2. Si hay texto de búsqueda, aplicar puntuación inteligente y filtro difuso
+    if (query) {
+        try {
+            const lowerQuery = query.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            const queryTerms = lowerQuery.split(/\s+/).filter(Boolean);
+
+            const scoredResults = filteredProducts
+                .map(p => ({ product: p, score: getMatchScore(p, queryTerms) }))
+                .filter(item => item.score > 0);
+
+            // Ordenar por puntaje descendente
+            scoredResults.sort((a, b) => b.score - a.score);
+            filteredProducts = scoredResults.map(item => item.product);
+        } catch (error) {
+            console.error('Error en búsqueda inteligente difusa:', error);
+        }
+    }
+
+    // 3. Renderizar resultados en el grid y actualizar contador
+    renderProductsInGrid(filteredProducts);
+    renderInventoryTable(filteredProducts);
+
+    if (resultsCount) {
+        if (query || category !== 'all') {
+            resultsCount.innerText = `${filteredProducts.length} resultados encontrados`;
+        } else {
+            resultsCount.innerText = `${GlobalState.allProducts.length} productos cargados`;
+        }
+    }
+};
+
 const performSearch = debounce((query) => {
     const resultsCount = document.getElementById('results-count');
     if (resultsCount) resultsCount.innerText = 'Buscando...';
-
-    if (!query) {
-        // Si no hay query, volvemos al estado inicial (todos los productos)
-        renderProductsInGrid(GlobalState.allProducts);
-        renderInventoryTable(GlobalState.allProducts);
-        if (resultsCount) resultsCount.innerText = `${GlobalState.allProducts.length} productos cargados`;
-        return;
-    }
-
-    try {
-        const lowerQuery = query.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-        const queryTerms = lowerQuery.split(/\s+/).filter(Boolean);
-
-        // Mapear con puntuaciones difusas y filtrar los que tengan coincidencia
-        const scoredResults = GlobalState.allProducts
-            .map(p => ({ product: p, score: getMatchScore(p, queryTerms) }))
-            .filter(item => item.score > 0);
-
-        // Ordenar por puntaje descendente (prioriza nombre, SKU, categoría)
-        scoredResults.sort((a, b) => b.score - a.score);
-
-        const results = scoredResults.map(item => item.product);
-
-        renderProductsInGrid(results);
-        renderInventoryTable(results);
-        if (resultsCount) {
-            resultsCount.innerText = `${results.length} resultados encontrados`;
-        }
-    } catch (error) {
-        console.error('Error en búsqueda inteligente difusa:', error);
-    }
+    applyFilters();
 }, 75);
 
 export function navigate(page) {
@@ -946,7 +965,7 @@ function setupGlobalEvents() {
         }
     });
 
-    // Detectar cambios en el método de pago para re-renderizar los totales fiscales en tiempo real
+    // Detectar cambios en el método de pago y en los filtros de categoría
     document.addEventListener('change', (e) => {
         if (e.target.id === 'checkout-metodo-pago') {
             const metodoPago = e.target.value;
@@ -980,6 +999,10 @@ function setupGlobalEvents() {
                     </div>
                 `;
             }
+        }
+        
+        if (e.target.id === 'filter-category') {
+            applyFilters();
         }
     });
 
