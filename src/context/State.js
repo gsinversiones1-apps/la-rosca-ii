@@ -9,8 +9,13 @@ export const GlobalState = {
     currentClient: null,
     tasaActual: 36.50,
     cartMetodoPago: 'PAGO MOVIL',
-    myTenantId: 'ROSC-001-VNZ',
+    myTenantId: '70dcc2c6-07ea-448f-8728-c8242fe96544',
     storeName: 'Tornillería La Rosca II',
+    
+    // Autenticación y RBAC
+    session: null,
+    user: null,
+    userRole: null,
     
     // Configuración persistente (RIF, Dirección, etc)
     config: JSON.parse(localStorage.getItem('pos_config')) || {

@@ -1,5 +1,6 @@
 /**
  * Componente Modal de Checkout (Identificación de Cliente)
+ * Con soporte para creación rápida de clientes, validación fiscal y soporte de selección por teclado.
  */
 
 import { GlobalState } from '../../context/State.js';
@@ -19,7 +20,7 @@ export const renderCheckoutModal = (totals) => {
                 </button>
             </div>
 
-            <div class="p-6 space-y-4">
+            <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
                 <!-- Método de Pago -->
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Método de Pago</label>
@@ -60,8 +61,9 @@ export const renderCheckoutModal = (totals) => {
 
                 <!-- Buscador de Cliente Inteligente -->
                 <div class="space-y-2 relative">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                        Identificación del Cliente
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest flex justify-between">
+                        <span>Identificación del Cliente</span>
+                        <span class="text-slate-400 text-[8px]">↑↓ para navegar, Enter para seleccionar</span>
                     </label>
                     <div class="relative">
                         <span class="material-symbols-outlined absolute left-3 top-3 text-slate-500">search</span>
@@ -72,7 +74,7 @@ export const renderCheckoutModal = (totals) => {
                     </div>
                     
                     <!-- Contenedor de Resultados del Autocompletado -->
-                    <div id="checkout-client-results" class="absolute w-full bg-dark-gray border border-industrial-gray mt-1 shadow-xl z-10 hidden max-h-48 overflow-y-auto custom-scrollbar">
+                    <div id="checkout-client-results" class="absolute w-full bg-dark-gray border border-industrial-gray mt-1 shadow-xl z-20 hidden max-h-48 overflow-y-auto custom-scrollbar">
                         <!-- Se llena vía JS -->
                     </div>
                 </div>
@@ -95,19 +97,26 @@ export const renderCheckoutModal = (totals) => {
                     <p class="text-[10px] text-gold font-bold uppercase tracking-widest mb-2 flex items-center gap-1">
                         <span class="material-symbols-outlined text-xs">person_add</span> Registrar Nuevo Cliente
                     </p>
-                    <input name="nombre" required type="text" placeholder="NOMBRE"
-                           style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
-                           class="w-full text-xs p-2 outline-none uppercase font-bold"/>
-                    <input name="apellido" type="text" placeholder="APELLIDO"
-                           style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
-                           class="w-full text-xs p-2 outline-none uppercase font-bold"/>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input name="nombre" required type="text" placeholder="NOMBRE"
+                               style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
+                               class="w-full text-xs p-2.5 outline-none uppercase font-bold"/>
+                        <input name="apellido" type="text" placeholder="APELLIDO (OPCIONAL)"
+                               style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
+                               class="w-full text-xs p-2.5 outline-none uppercase font-bold"/>
+                    </div>
                     <div class="flex gap-2">
-                        <input name="rif" id="checkout-new-rif" required type="text" placeholder="CÉDULA / RIF"
-                               style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
-                               class="w-1/2 text-xs p-2 outline-none uppercase font-bold"/>
-                        <input name="telefono" type="text" placeholder="TELÉFONO"
-                               style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
-                               class="w-1/2 text-xs p-2 outline-none uppercase font-bold"/>
+                        <div class="w-1/2 flex flex-col gap-1">
+                            <input name="rif" id="checkout-new-rif" required type="text" placeholder="CÉDULA / RIF (V-XXXXXXX)"
+                                   style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
+                                   class="w-full text-xs p-2.5 outline-none uppercase font-bold"/>
+                            <span id="checkout-rif-error" class="text-[8px] text-slate-500 font-bold">V-XXXXXXXX o J-XXXXXXXX-X</span>
+                        </div>
+                        <div class="w-1/2">
+                            <input name="telefono" id="checkout-new-telefono" type="text" placeholder="TELÉFONO (04XX-XXXXXXX)"
+                                   style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
+                                   class="w-full text-xs p-2.5 outline-none uppercase font-bold"/>
+                        </div>
                     </div>
                 </form>
 
@@ -132,4 +141,76 @@ export const renderCheckoutModal = (totals) => {
         </div>
     </div>
     `;
+};
+
+/**
+ * Agrega validación y formateo en vivo para los campos del formulario de Checkout
+ */
+export const setupCheckoutValidation = () => {
+    const rifInput = document.getElementById('checkout-new-rif');
+    const telInput = document.getElementById('checkout-new-telefono');
+    const errorSpan = document.getElementById('checkout-rif-error');
+    const btnConfirm = document.getElementById('btn-confirm-checkout');
+
+    if (rifInput) {
+        rifInput.addEventListener('input', (e) => {
+            let val = e.target.value.toUpperCase().replace(/[^VJGEx0-9-]/g, '');
+            let raw = val.replace(/-/g, '');
+            let formatted = '';
+            
+            if (raw.length > 0) {
+                const prefix = raw.charAt(0);
+                if (['V', 'J', 'G', 'E'].includes(prefix)) {
+                    let numbers = raw.slice(1).replace(/[^0-9]/g, '');
+                    if (numbers.length > 8) {
+                        formatted = `${prefix}-${numbers.slice(0, 8)}-${numbers.slice(8, 9)}`;
+                    } else if (numbers.length > 0) {
+                        formatted = `${prefix}-${numbers}`;
+                    } else {
+                        formatted = prefix;
+                    }
+                } else {
+                    let numbers = raw.replace(/[^0-9]/g, '');
+                    if (numbers.length > 8) {
+                        formatted = `V-${numbers.slice(0, 8)}-${numbers.slice(8, 9)}`;
+                    } else if (numbers.length > 0) {
+                        formatted = `V-${numbers}`;
+                    }
+                }
+            }
+            
+            e.target.value = formatted;
+            
+            // Validar formato completo
+            const regex = /^[VJGVEvjgve]-[0-9]{7,8}(-[0-9])?$/;
+            const isValid = regex.test(formatted);
+            
+            if (isValid) {
+                rifInput.style.borderColor = '#22c55e';
+                if (errorSpan) {
+                    errorSpan.innerText = '✓ RIF Válido';
+                    errorSpan.className = 'text-[8px] text-green-500 font-bold';
+                }
+                if (btnConfirm) btnConfirm.removeAttribute('disabled');
+            } else {
+                rifInput.style.borderColor = '#ef4444';
+                if (errorSpan) {
+                    errorSpan.innerText = '✗ RIF Inválido';
+                    errorSpan.className = 'text-[8px] text-red-500 font-bold';
+                }
+                if (btnConfirm) btnConfirm.setAttribute('disabled', 'true');
+            }
+        });
+    }
+
+    if (telInput) {
+        telInput.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/[^0-9]/g, '');
+            if (val.length > 4) {
+                e.target.value = `${val.slice(0, 4)}-${val.slice(4, 11)}`;
+            } else {
+                e.target.value = val;
+            }
+        });
+    }
 };

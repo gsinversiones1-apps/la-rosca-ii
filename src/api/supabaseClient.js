@@ -5,6 +5,37 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+export const signIn = async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+    });
+    if (error) throw error;
+    return data;
+};
+
+export const signOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+};
+
+export const getSession = async () => {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return data.session;
+};
+
+export const getUserProfile = async (userId) => {
+    const { data, error } = await supabase
+        .from('perfiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+        
+    if (error) throw error;
+    return data;
+};
+
 /**
  * Función genérica para obtener productos por Tenant
  */

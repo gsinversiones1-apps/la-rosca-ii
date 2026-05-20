@@ -2,9 +2,15 @@
  * Componente Sidebar para el SaaS
  */
 
-export const renderSidebar = (storeName = "GLOBAL POS") => {
+export const renderSidebar = (storeName = "GLOBAL POS", userRole = 'vendedor') => {
+    const settingsButton = userRole === 'admin' 
+        ? `<a id="btn-open-settings" class="text-slate-400 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all mt-10 cursor-pointer">
+                <span class="material-symbols-outlined text-sm text-gold">settings</span> Configuración
+           </a>`
+        : '';
+
     return `
-    <aside class="fixed left-0 top-0 h-full w-64 flex flex-col z-40 bg-navy border-r border-industrial-gray shadow-xl">
+    <aside id="main-sidebar" class="fixed left-0 top-0 h-full w-64 flex flex-col z-50 bg-navy border-r border-industrial-gray shadow-xl transform -translate-x-full md:translate-x-0 transition-transform duration-300">
         <div class="p-6 border-b border-industrial-gray">
             <h1 id="sidebar-store-name" class="text-lg font-bold text-white font-headline uppercase tracking-widest">
                 ${storeName.split(' ')[0]} <span class="text-gold">POS</span>
@@ -29,9 +35,7 @@ export const renderSidebar = (storeName = "GLOBAL POS") => {
                 <span class="material-symbols-outlined">group</span> Clientes
             </button>
             
-            <a id="btn-open-settings" class="text-slate-500 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all mt-10 cursor-pointer">
-                <span class="material-symbols-outlined text-sm text-gold">settings</span> Configuración
-            </a>
+            ${settingsButton}
             
             <div class="px-4 mt-6 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest border-t border-industrial-gray pt-6">Estado del Sistema</div>
             <div class="px-4 py-4">

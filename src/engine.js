@@ -5,12 +5,12 @@
 
 import { GlobalState, updateState } from './context/State.js';
 import { fetchTasaBCV } from './api/bcv.js';
-import { getProductsByTenant } from './api/supabaseClient.js';
+import { getProductsByTenant, getSession, getUserProfile, signIn, signOut } from './api/supabaseClient.js';
 import { getClients, createClient } from './api/clients.js';
 import { saveSale } from './api/sales.js';
 import { getPendingSales, saveProductsLocal, getProductsLocal } from './utils/db.js';
-import { buscarTornillos } from './api/inventario.js';
 import { processSyncQueue } from './utils/syncManager.js';
+import { renderLoginPage } from './pages/LoginPage.js';
 import { renderSidebar } from './layouts/Sidebar.js';
 import { renderNavbar } from './layouts/Navbar.js';
 import { renderPOSPage } from './pages/POSPage.js';
@@ -20,10 +20,12 @@ import { getDashboardData } from './api/dashboard.js';
 import { renderProductCard } from './components/pos/ProductCard.js';
 import { renderInventoryRow } from './components/inventory/InventoryRow.js';
 import { renderCartSidebar } from './components/pos/CartSidebar.js';
-import { renderClientModal } from './components/pos/ClientModal.js';
+import { renderClientModal, setupClientModalValidation } from './components/pos/ClientModal.js';
 import { renderInvoiceModal } from './components/pos/InvoiceModal.js';
-import { renderCheckoutModal } from './components/pos/CheckoutModal.js';
+import { renderCheckoutModal, setupCheckoutValidation } from './components/pos/CheckoutModal.js';
+import { renderClientsPage, renderClientRow } from './pages/ClientsPage.js';
 import { useCart } from './hooks/useCart.js';
+import { imprimirTicketFiscal } from './utils/fiscalDriver.js';
 
 const { addToCart, removeFromCart, clearCart, calculateTotals } = useCart();
 
@@ -59,23 +61,43 @@ async function initApp() {
     const appContainer = document.getElementById('app');
     if (!appContainer) return;
 
-    appContainer.innerHTML = `
-        <div id="layout-sidebar"></div>
-        <div class="flex-1 ml-64 mr-80 flex flex-col h-full bg-background">
-            <div id="layout-navbar"></div>
-            <main id="content-area" class="flex-1 overflow-y-auto p-6 custom-scrollbar"></main>
-        </div>
-        <div id="layout-cart-sidebar"></div>
-        <div id="modal-wrapper"></div>
-    `;
-
-    document.getElementById('layout-sidebar').innerHTML = renderSidebar(GlobalState.storeName);
-    
-    const tasa = await fetchTasaBCV();
-    updateState('tasaActual', tasa);
-    document.getElementById('layout-navbar').innerHTML = renderNavbar(GlobalState.storeName, GlobalState.tasaActual);
-    
     try {
+        // 0. AUTHENTICATION CHECK
+        const session = await getSession();
+        if (!session) {
+            appContainer.innerHTML = renderLoginPage();
+            setupLoginEvents();
+            return; // Detener inicialización del dashboard hasta que inicie sesión
+        }
+
+        // Si hay sesión, cargar perfil y continuar
+        updateState('session', session);
+        updateState('user', session.user);
+        try {
+            const profile = await getUserProfile(session.user.id);
+            updateState('userRole', profile.rol);
+        } catch (err) {
+            console.error('Error cargando perfil:', err);
+            updateState('userRole', 'vendedor'); // Default seguro
+        }
+
+        appContainer.innerHTML = `
+            <div id="mobile-overlay" class="fixed inset-0 bg-black/80 z-40 hidden transition-opacity duration-300 opacity-0 md:hidden"></div>
+            <div id="layout-sidebar"></div>
+            <div id="main-content-wrapper" class="flex-1 md:ml-64 lg:mr-80 flex flex-col h-full bg-background transition-all duration-300 w-full relative">
+                <div id="layout-navbar"></div>
+                <main id="content-area" class="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar"></main>
+            </div>
+            <div id="layout-cart-sidebar"></div>
+            <div id="modal-wrapper"></div>
+        `;
+
+        document.getElementById('layout-sidebar').innerHTML = renderSidebar(GlobalState.storeName, GlobalState.userRole);
+        
+        const tasa = await fetchTasaBCV();
+        updateState('tasaActual', tasa);
+        document.getElementById('layout-navbar').innerHTML = renderNavbar(GlobalState.storeName, GlobalState.tasaActual, GlobalState.user, GlobalState.userRole);
+        
         // 1. Cargar caché local primero (Offline-First)
         let localProducts = [];
         try {
@@ -119,9 +141,44 @@ async function initApp() {
     setupGlobalEvents();
 }
 
+function setupLoginEvents() {
+    document.addEventListener('submit', async (e) => {
+        if (e.target.id === 'login-form') {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login-submit');
+            const errBox = document.getElementById('login-error');
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            btn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span><span>CARGANDO...</span>`;
+            errBox.classList.add('hidden');
+            
+            try {
+                await signIn(email, password);
+                location.reload(); // Recargar la app para iniciar como usuario logueado
+            } catch (error) {
+                errBox.innerText = error.message === 'Invalid login credentials' ? 'Credenciales incorrectas.' : error.message;
+                errBox.classList.remove('hidden');
+                btn.innerHTML = `<span>INICIAR SESIÓN</span><span class="material-symbols-outlined text-sm">login</span>`;
+            }
+        }
+    });
+}
+
 function updateCartUI() {
     const container = document.getElementById('layout-cart-sidebar');
     if (container) container.innerHTML = renderCartSidebar();
+
+    // Actualizar badge móvil del carrito
+    const mobileBadge = document.getElementById('mobile-cart-badge');
+    if (mobileBadge) {
+        if (GlobalState.cart.length > 0) {
+            mobileBadge.innerText = GlobalState.cart.length;
+            mobileBadge.classList.remove('hidden');
+        } else {
+            mobileBadge.classList.add('hidden');
+        }
+    }
 }
 
 function updateStatus(text, color) {
@@ -147,7 +204,7 @@ function debounce(func, wait) {
     };
 }
 
-const performSearch = debounce(async (query) => {
+const performSearch = debounce((query) => {
     const resultsCount = document.getElementById('results-count');
     if (resultsCount) resultsCount.innerText = 'Buscando...';
 
@@ -160,42 +217,120 @@ const performSearch = debounce(async (query) => {
     }
 
     try {
-        // 1. Intentar Búsqueda Inteligente en Supabase (FTS)
-        if (navigator.onLine) {
-            const results = await buscarTornillos(query);
-            renderProductsInGrid(results);
-            renderInventoryTable(results);
-            if (resultsCount) resultsCount.innerText = `${results.length} resultados encontrados`;
-        } else {
-            // 2. Fallback: Búsqueda Local (Offline)
-            const lowerQuery = query.toLowerCase();
-            const results = GlobalState.allProducts.filter(p => 
-                (p.nombre || '').toLowerCase().includes(lowerQuery) ||
-                (p.codigo_skv || '').toLowerCase().includes(lowerQuery) ||
-                (p.area || '').toLowerCase().includes(lowerQuery)
+        const lowerQuery = query.toLowerCase().trim();
+        const queryTerms = lowerQuery.split(/\s+/).filter(Boolean);
+
+        // Búsqueda inteligente multi-término en memoria
+        const results = GlobalState.allProducts.filter(p => {
+            return queryTerms.every(term => 
+                (p.nombre || '').toLowerCase().includes(term) ||
+                (p.codigo_skv || '').toLowerCase().includes(term) ||
+                (p.area || '').toLowerCase().includes(term) ||
+                (p.medida || '').toLowerCase().includes(term)
             );
-            renderProductsInGrid(results);
-            renderInventoryTable(results);
-            if (resultsCount) resultsCount.innerText = `${results.length} resultados (Modo Offline)`;
+        });
+
+        renderProductsInGrid(results);
+        renderInventoryTable(results);
+        if (resultsCount) {
+            resultsCount.innerText = `${results.length} resultados encontrados`;
         }
     } catch (error) {
-        console.error('Error en búsqueda:', error);
+        console.error('Error en búsqueda inteligente:', error);
     }
-}, 300);
+}, 150);
 
 export function navigate(page) {
     const contentArea = document.getElementById('content-area');
     if (!contentArea) return;
+    
+    // Auth Guards
+    if (!GlobalState.session) {
+        alert("Debe iniciar sesión primero.");
+        return;
+    }
+
+    if (page === 'dashboard' && GlobalState.userRole !== 'admin') {
+        alert("Acceso denegado. Se requiere perfil de Administrador para ver el Dashboard.");
+        page = 'pos';
+    }
+
+    // Limpiar input de búsqueda al cambiar de vista
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
+
+    // Highlight active sidebar item
+    document.querySelectorAll('#main-sidebar button').forEach(btn => {
+        btn.classList.remove('text-gold', 'bg-white/5');
+        btn.classList.add('text-slate-400');
+    });
+    const activeBtn = document.getElementById(`nav-${page}`);
+    if (activeBtn) {
+        activeBtn.classList.remove('text-slate-400');
+        activeBtn.classList.add('text-gold', 'bg-white/5');
+    }
+
     if (page === 'pos') {
         contentArea.innerHTML = renderPOSPage();
         renderProductsInGrid();
     } else if (page === 'inventory') {
-        contentArea.innerHTML = renderInventoryPage();
+        contentArea.innerHTML = renderInventoryPage(GlobalState.userRole);
         renderInventoryTable();
     } else if (page === 'dashboard') {
         contentArea.innerHTML = renderDashboardPage();
         loadDashboardData();
+    } else if (page === 'clients') {
+        contentArea.innerHTML = renderClientsPage();
+        renderClientsTable();
+        updateClientsKPIs();
     }
+}
+
+export function renderClientsTable(clients = GlobalState.allClients || []) {
+    const tbody = document.getElementById('clients-table-body');
+    const badge = document.getElementById('clients-count-badge');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    const safeClients = Array.isArray(clients) ? clients : [];
+    if (safeClients.length === 0) {
+        tbody.innerHTML = `
+        <tr>
+            <td colspan="5" class="p-8 text-center text-slate-500 uppercase tracking-widest font-bold">
+                No se encontraron clientes
+            </td>
+        </tr>
+        `;
+        if (badge) badge.innerText = '0 CLIENTES';
+        return;
+    }
+
+    safeClients.forEach(c => {
+        tbody.innerHTML += renderClientRow(c);
+    });
+    if (badge) badge.innerText = `${safeClients.length} CLIENTES`;
+}
+
+export function updateClientsKPIs() {
+    const totalEl = document.getElementById('kpi-total-clients');
+    const juridicosEl = document.getElementById('kpi-juridicos-clients');
+    const naturalesEl = document.getElementById('kpi-naturales-clients');
+    if (!totalEl) return;
+
+    const clients = Array.isArray(GlobalState.allClients) ? GlobalState.allClients : [];
+    totalEl.innerText = clients.length;
+    
+    const juridicos = clients.filter(c => {
+        const ced = c && c.cedula ? String(c.cedula).toUpperCase() : '';
+        return ced.startsWith('J-');
+    }).length;
+    juridicosEl.innerText = juridicos;
+    
+    const naturales = clients.filter(c => {
+        const ced = c && c.cedula ? String(c.cedula).toUpperCase() : '';
+        return ced.startsWith('V-') || ced.startsWith('E-');
+    }).length;
+    naturalesEl.innerText = naturales;
 }
 
 async function loadDashboardData() {
@@ -265,7 +400,19 @@ function renderProductsInGrid(products = GlobalState.allProducts) {
 function renderInventoryTable(products = GlobalState.allProducts) {
     const tbody = document.getElementById('inventory-table-body');
     if (!tbody) return;
-    tbody.innerHTML = products.map(p => renderInventoryRow(p)).join('');
+    
+    if (products.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" class="px-6 py-8 text-center text-slate-500 uppercase tracking-widest font-bold">
+                    No se encontraron productos
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = products.map(p => renderInventoryRow(p, GlobalState.userRole)).join('');
 }
 
 async function handleCheckout(isConsumidorFinal = false) {
@@ -331,6 +478,24 @@ async function handleCheckout(isConsumidorFinal = false) {
 
         const savedRows = await saveSale(saleData);
         
+        // --- INICIO INTEGRACIÓN FISCAL DRIVER ---
+        const payloadFiscal = {
+            cliente: isConsumidorFinal ? "CONSUMIDOR FINAL" : (GlobalState.currentClient.nombre + " " + (GlobalState.currentClient.apellido || '')).trim(),
+            cedula_rif: isConsumidorFinal ? "V00000000" : GlobalState.currentClient.cedula,
+            pagoDivisas: totals.totalUsd,
+            pagoBs: totals.totalBs,
+            metodoPago: totals.metodoPago,
+            items: saleData.items
+        };
+
+        try {
+            await imprimirTicketFiscal(payloadFiscal);
+            console.log("Ticket encolado exitosamente en el Agente Fiscal C#");
+        } catch (fiscalError) {
+            console.warn("Advertencia de Impresión:", fiscalError.message);
+        }
+        // --- FIN INTEGRACIÓN FISCAL DRIVER ---
+
         // Construir objeto 'sale' para el InvoiceModal
         // saveSale ahora retorna array de filas (una por item), construimos un objeto resumen
         const firstRow = Array.isArray(savedRows) ? savedRows[0] : savedRows;
@@ -417,9 +582,56 @@ function setupGlobalEvents() {
     window.addEventListener('local-stock-updated', renderProductsInGrid);
 
     document.addEventListener('click', async (e) => {
-        if (e.target.closest('#nav-pos')) navigate('pos');
-        if (e.target.closest('#nav-inventory')) navigate('inventory');
-        if (e.target.closest('#nav-dashboard')) navigate('dashboard');
+        // --- Lógica de Drawers Responsivos ---
+        const closeDrawers = () => {
+            const sidebar = document.getElementById('main-sidebar');
+            const cartSidebar = document.getElementById('cart-sidebar');
+            const overlay = document.getElementById('mobile-overlay');
+            
+            if (sidebar) sidebar.classList.add('-translate-x-full');
+            if (cartSidebar) cartSidebar.classList.add('translate-x-full');
+            if (overlay) {
+                overlay.classList.add('opacity-0');
+                setTimeout(() => overlay.classList.add('hidden'), 300);
+            }
+        };
+
+        if (e.target.closest('#btn-logout')) {
+            try {
+                await signOut();
+                location.reload();
+            } catch (err) {
+                console.error("Error al cerrar sesión:", err);
+            }
+            return;
+        }
+
+        if (e.target.closest('#btn-mobile-menu')) {
+            document.getElementById('main-sidebar').classList.toggle('-translate-x-full');
+            const overlay = document.getElementById('mobile-overlay');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            return;
+        }
+
+        if (e.target.closest('#btn-mobile-cart')) {
+            document.getElementById('cart-sidebar').classList.toggle('translate-x-full');
+            const overlay = document.getElementById('mobile-overlay');
+            overlay.classList.remove('hidden');
+            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+            return;
+        }
+
+        if (e.target.closest('#mobile-overlay')) {
+            closeDrawers();
+            return;
+        }
+
+        // --- Navegación ---
+        if (e.target.closest('#nav-pos')) { navigate('pos'); closeDrawers(); }
+        if (e.target.closest('#nav-inventory')) { navigate('inventory'); closeDrawers(); }
+        if (e.target.closest('#nav-dashboard')) { navigate('dashboard'); closeDrawers(); }
+        if (e.target.closest('#nav-clients')) { navigate('clients'); closeDrawers(); }
         if (e.target.closest('#header-refresh')) initApp();
 
         // Sync manual
@@ -482,6 +694,7 @@ function setupGlobalEvents() {
             }
             const totals = calculateTotals(GlobalState.tasaActual);
             document.getElementById('modal-wrapper').innerHTML = renderCheckoutModal(totals);
+            setupCheckoutValidation();
             setTimeout(() => document.getElementById('checkout-client-search')?.focus(), 100);
         }
 
@@ -544,8 +757,17 @@ function setupGlobalEvents() {
         }
 
         // Modales (Cliente y Factura)
-        if (e.target.closest('#btn-add-client-fast')) {
+        if (e.target.closest('#btn-add-client-fast') || e.target.closest('#btn-add-client')) {
             document.getElementById('modal-wrapper').innerHTML = renderClientModal();
+            setupClientModalValidation();
+        }
+        if (e.target.closest('.btn-edit-client')) {
+            const id = e.target.closest('.btn-edit-client').dataset.id;
+            const client = GlobalState.allClients.find(c => c.id == id);
+            if (client) {
+                document.getElementById('modal-wrapper').innerHTML = renderClientModal(client);
+                setupClientModalValidation();
+            }
         }
         if (e.target.closest('#btn-close-modal') || e.target.closest('#btn-cancel-client') || e.target.closest('#btn-close-invoice')) {
             document.getElementById('modal-wrapper').innerHTML = '';
@@ -559,6 +781,17 @@ function setupGlobalEvents() {
     document.addEventListener('input', (e) => {
         if (e.target.id === 'search-input') {
             performSearch(e.target.value.trim());
+        }
+
+        if (e.target.id === 'clients-search-input') {
+            const query = e.target.value.toLowerCase().trim();
+            const filtered = GlobalState.allClients.filter(c => 
+                (c.nombre && c.nombre.toLowerCase().includes(query)) || 
+                (c.apellido && c.apellido.toLowerCase().includes(query)) ||
+                (c.cedula && c.cedula.toLowerCase().includes(query)) ||
+                (c.telefono && c.telefono.toLowerCase().includes(query))
+            );
+            renderClientsTable(filtered);
         }
 
         if (e.target.id === 'checkout-client-search') {
@@ -608,14 +841,27 @@ function setupGlobalEvents() {
             e.preventDefault();
             const formData = new FormData(e.target);
             const clientData = Object.fromEntries(formData.entries());
+            
+            const id = e.target.dataset.id;
+            if (id) clientData.id = id;
+
             try {
                 const newClient = await createClient(clientData);
                 const updatedClients = await getClients();
                 updateState('allClients', updatedClients);
-                updateState('currentClient', newClient);
+                
+                // Refrescar vistas dependiendo de dónde estemos
+                const searchInput = document.getElementById('clients-search-input');
+                if (searchInput) {
+                    renderClientsTable();
+                    updateClientsKPIs();
+                } else {
+                    updateState('currentClient', newClient);
+                    updateCartUI();
+                }
+                
                 document.getElementById('modal-wrapper').innerHTML = '';
-                updateCartUI();
-            } catch (err) { console.error('Error:', err); }
+            } catch (err) { console.error('Error al guardar cliente:', err); }
         }
     });
 
@@ -653,6 +899,57 @@ function setupGlobalEvents() {
                     </div>
                 `;
             }
+        }
+    });
+
+    let activeClientIndex = -1;
+
+    document.addEventListener('keydown', (e) => {
+        const searchInput = document.getElementById('checkout-client-search');
+        if (!searchInput || searchInput !== document.activeElement) return;
+
+        const resultsContainer = document.getElementById('checkout-client-results');
+        if (!resultsContainer || resultsContainer.classList.contains('hidden')) return;
+
+        const options = resultsContainer.querySelectorAll('.checkout-client-option');
+        if (options.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeClientIndex = (activeClientIndex + 1) % options.length;
+            highlightOption(options, activeClientIndex);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeClientIndex = (activeClientIndex - 1 + options.length) % options.length;
+            highlightOption(options, activeClientIndex);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (activeClientIndex >= 0 && activeClientIndex < options.length) {
+                options[activeClientIndex].click();
+                activeClientIndex = -1;
+            }
+        } else if (e.key === 'Escape') {
+            resultsContainer.classList.add('hidden');
+            activeClientIndex = -1;
+        }
+    });
+
+    function highlightOption(options, index) {
+        options.forEach((opt, idx) => {
+            if (idx === index) {
+                opt.style.background = 'rgba(255, 255, 255, 0.15)';
+                opt.style.borderColor = '#D4A817';
+                opt.scrollIntoView({ block: 'nearest' });
+            } else {
+                opt.style.background = '';
+                opt.style.borderColor = '';
+            }
+        });
+    }
+
+    document.addEventListener('input', (e) => {
+        if (e.target.id === 'checkout-client-search') {
+            activeClientIndex = -1;
         }
     });
 }

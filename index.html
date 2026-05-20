@@ -7,17 +7,75 @@
     
     <!-- Frameworks & Fonts -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    screens: {
+                        'sm': '480px',
+                        'md': '768px',
+                        'lg': '1024px',
+                        'xl': '1280px',
+                    },
+                    colors: {
+                        background: '#0D1117',
+                        navy: '#1B263B',
+                        gold: '#D4AF37',
+                        'dark-gray': '#24292E',
+                        'industrial-gray': '#30363D'
+                    }
+                }
+            }
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0D1117; color: #E6EDF3; }
+        :root {
+            /* Design System First: Tipografía Fluida y Espaciados base usando clamp() */
+            --font-size-xs: clamp(0.7rem, 0.5vw + 0.5rem, 0.75rem);
+            --font-size-sm: clamp(0.8rem, 0.6vw + 0.6rem, 0.875rem);
+            --font-size-base: clamp(0.875rem, 1vw + 0.5rem, 1rem);
+            --font-size-lg: clamp(1rem, 1.2vw + 0.6rem, 1.125rem);
+            --font-size-xl: clamp(1.125rem, 1.5vw + 0.8rem, 1.25rem);
+            --spacing-base: clamp(1rem, 2vw, 1.5rem);
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--color-background, #0D1117); 
+            color: #E6EDF3; 
+            font-size: var(--font-size-base);
+        }
+        
+        /* Reemplazo de utilidades antiguas por las de Tailwind Config */
         .bg-navy { background-color: #1B263B; }
         .text-gold { color: #D4AF37; }
         .bg-gold { background-color: #D4AF37; }
         .border-gold { border-color: #D4AF37; }
         .bg-dark-gray { background-color: #24292E; }
         .border-industrial-gray { border-color: #30363D; }
+        
+        /* Utilidades de Componentes Atómicos (Nivel 2) */
+        .table-responsive-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* Ocultar scrollbar de forma limpia */
+        .custom-scrollbar::-webkit-scrollbar,
+        .table-responsive-wrapper::-webkit-scrollbar { width: 6px; height: 6px; }
+        
+        .custom-scrollbar::-webkit-scrollbar-track,
+        .table-responsive-wrapper::-webkit-scrollbar-track { background: transparent; }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb,
+        .table-responsive-wrapper::-webkit-scrollbar-thumb { background: #30363D; border-radius: 3px; }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover,
+        .table-responsive-wrapper::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden bg-background text-slate-300">

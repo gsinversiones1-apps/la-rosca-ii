@@ -11,7 +11,7 @@ export const renderCartSidebar = () => {
     const { subtotal, iva, igtf, totalUsd, totalBs } = calculateTotals(GlobalState.tasaActual, GlobalState.cartMetodoPago);
     
     return `
-    <aside class="fixed right-0 top-0 h-full w-80 bg-navy border-l border-industrial-gray shadow-2xl z-40 flex flex-col">
+    <aside id="cart-sidebar" class="fixed right-0 top-0 h-full w-80 bg-navy border-l border-industrial-gray shadow-2xl z-50 flex flex-col transform translate-x-full lg:translate-x-0 transition-transform duration-300">
         <div class="p-6 border-b border-industrial-gray flex justify-between items-center bg-dark-gray">
             <h3 class="font-headline text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
                 <span class="material-symbols-outlined text-gold">shopping_basket</span> Carrito
