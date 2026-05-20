@@ -205,7 +205,63 @@ function debounce(func, wait) {
     };
 }
 
-const performSearch = (query) => {
+function isFuzzySubsequence(text, query) {
+    let queryIdx = 0;
+    for (let textIdx = 0; textIdx < text.length; textIdx++) {
+        if (text[textIdx] === query[queryIdx]) {
+            queryIdx++;
+        }
+        if (queryIdx === query.length) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function getMatchScore(product, queryTerms) {
+    let totalScore = 0;
+    const normalize = (val) => (val || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    
+    const name = normalize(product.nombre);
+    const sku = normalize(product.codigo_skv);
+    const area = normalize(product.area);
+    const medida = normalize(product.medida);
+    
+    for (const term of queryTerms) {
+        let termScore = 0;
+        
+        // Coincidencia exacta de subcadena (Máxima prioridad)
+        if (name.includes(term)) {
+            termScore = Math.max(termScore, name.startsWith(term) ? 100 : 80);
+        } else if (sku.includes(term)) {
+            termScore = Math.max(termScore, sku.startsWith(term) ? 90 : 70);
+        } else if (area.includes(term)) {
+            termScore = Math.max(termScore, 60);
+        } else if (medida.includes(term)) {
+            termScore = Math.max(termScore, 50);
+        }
+        // Coincidencia difusa por subsecuencia (Fuzzy search)
+        else if (isFuzzySubsequence(name, term)) {
+            termScore = Math.max(termScore, 40);
+        } else if (isFuzzySubsequence(sku, term)) {
+            termScore = Math.max(termScore, 30);
+        } else if (isFuzzySubsequence(area, term)) {
+            termScore = Math.max(termScore, 20);
+        } else if (isFuzzySubsequence(medida, term)) {
+            termScore = Math.max(termScore, 10);
+        }
+        
+        if (termScore === 0) {
+            return 0; // Si no coincide el término en ningún campo, se descarta el producto
+        }
+        
+        totalScore += termScore;
+    }
+    
+    return totalScore;
+}
+
+const performSearch = debounce((query) => {
     const resultsCount = document.getElementById('results-count');
     if (resultsCount) resultsCount.innerText = 'Buscando...';
 
@@ -218,18 +274,18 @@ const performSearch = (query) => {
     }
 
     try {
-        const lowerQuery = query.toLowerCase().trim();
+        const lowerQuery = query.toLowerCase().trim().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
         const queryTerms = lowerQuery.split(/\s+/).filter(Boolean);
 
-        // Búsqueda inteligente multi-término en memoria
-        const results = GlobalState.allProducts.filter(p => {
-            return queryTerms.every(term => 
-                (p.nombre || '').toLowerCase().includes(term) ||
-                (p.codigo_skv || '').toLowerCase().includes(term) ||
-                (p.area || '').toLowerCase().includes(term) ||
-                (p.medida || '').toLowerCase().includes(term)
-            );
-        });
+        // Mapear con puntuaciones difusas y filtrar los que tengan coincidencia
+        const scoredResults = GlobalState.allProducts
+            .map(p => ({ product: p, score: getMatchScore(p, queryTerms) }))
+            .filter(item => item.score > 0);
+
+        // Ordenar por puntaje descendente (prioriza nombre, SKU, categoría)
+        scoredResults.sort((a, b) => b.score - a.score);
+
+        const results = scoredResults.map(item => item.product);
 
         renderProductsInGrid(results);
         renderInventoryTable(results);
@@ -237,9 +293,9 @@ const performSearch = (query) => {
             resultsCount.innerText = `${results.length} resultados encontrados`;
         }
     } catch (error) {
-        console.error('Error en búsqueda inteligente:', error);
+        console.error('Error en búsqueda inteligente difusa:', error);
     }
-};
+}, 75);
 
 export function navigate(page) {
     const contentArea = document.getElementById('content-area');
