@@ -648,9 +648,13 @@ function setupGlobalEvents() {
             const sidebar = document.getElementById('main-sidebar');
             const cartSidebar = document.getElementById('cart-sidebar');
             const overlay = document.getElementById('mobile-overlay');
+            const searchContainer = document.getElementById('search-container');
             
             if (sidebar) sidebar.classList.add('-translate-x-full');
             if (cartSidebar) cartSidebar.classList.add('translate-x-full');
+            if (searchContainer && window.innerWidth < 768) {
+                searchContainer.classList.add('hidden');
+            }
             if (overlay) {
                 overlay.classList.add('opacity-0');
                 setTimeout(() => overlay.classList.add('hidden'), 300);
@@ -677,6 +681,17 @@ function setupGlobalEvents() {
 
         if (e.target.closest('#btn-close-sidebar')) {
             closeDrawers();
+            return;
+        }
+
+        if (e.target.closest('#btn-mobile-search')) {
+            const searchContainer = document.getElementById('search-container');
+            if (searchContainer) {
+                searchContainer.classList.toggle('hidden');
+                if (!searchContainer.classList.contains('hidden')) {
+                    document.getElementById('search-input')?.focus();
+                }
+            }
             return;
         }
 

@@ -17,27 +17,41 @@ export const renderNavbar = (storeName, tasa, user = null, userRole = '') => {
         : '';
 
     return `
-    <header class="flex justify-between items-center w-full px-4 py-3 md:px-6 md:py-4 bg-dark-gray border-b border-industrial-gray z-30">
+    <header class="flex justify-between items-center w-full px-4 py-3 md:px-6 md:py-4 bg-dark-gray border-b border-industrial-gray z-30 relative">
         <div class="flex items-center gap-2 md:gap-4">
             <button id="btn-mobile-menu" class="text-slate-400 hover:text-gold transition-colors md:hidden flex items-center justify-center p-1">
                 <span class="material-symbols-outlined text-xl">menu</span>
             </button>
-            <div id="header-store-name" class="text-sm md:text-xl font-bold text-white tracking-tighter font-headline uppercase whitespace-nowrap">
-                ${storeName.replace(' ', ' <span class="text-gold">')}</span>
+            <div class="flex flex-col justify-center">
+                <div id="header-store-name" class="text-sm md:text-xl font-bold text-white tracking-tighter font-headline uppercase whitespace-nowrap">
+                    ${storeName.replace(' ', ' <span class="text-gold">')}</span>
+                </div>
+                <!-- Tasa BCV en móvil debajo del nombre de la tienda -->
+                <div class="text-[8px] md:hidden font-bold text-slate-400 uppercase tracking-wider mt-0.5 leading-none">
+                    Tasa BCV: <span id="tasa-display-mobile" class="text-gold font-black">${formatCurrency(tasa)} Bs.</span>
+                </div>
             </div>
         </div>
-        <div class="flex-1 max-w-xs md:max-w-xl mx-2 md:mx-8">
+        
+        <!-- Buscador Responsivo: En móvil se posiciona de forma absoluta abajo del header al desplegarse -->
+        <div id="search-container" class="hidden md:block flex-1 max-w-xs md:max-w-xl mx-2 md:mx-8 absolute md:relative top-full md:top-auto left-0 md:left-auto w-full md:w-auto bg-dark-gray md:bg-transparent px-4 py-2 md:p-0 border-b md:border-b-0 border-industrial-gray z-20">
             <div class="relative group">
                 <span class="material-symbols-outlined absolute left-2.5 top-2 md:top-2.5 text-slate-500 group-focus-within:text-gold transition-colors text-sm md:text-base">search</span>
-                <input id="search-input" class="w-full bg-white border border-industrial-gray focus:border-gold focus:ring-0 rounded-sm pl-8 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-black font-bold text-[10px] md:text-xs uppercase tracking-wide transition-all placeholder-slate-500" placeholder="BUSCAR..." type="text"/>
+                <input id="search-input" class="w-full bg-white border border-industrial-gray focus:border-gold focus:ring-0 rounded-sm pl-8 md:pl-10 pr-3 md:pr-4 py-1.5 md:py-2 text-black font-bold text-xs uppercase tracking-wide transition-all placeholder-slate-500" placeholder="BUSCAR PRODUCTO O SKU..." type="text"/>
             </div>
         </div>
+        
         <div class="flex items-center gap-2 md:gap-4">
+            <!-- Botón de Búsqueda Móvil -->
+            <button id="btn-mobile-search" class="text-slate-400 hover:text-gold transition-colors md:hidden flex items-center justify-center p-1.5" title="Buscar Producto">
+                <span class="material-symbols-outlined text-xl">search</span>
+            </button>
+
             <button id="header-refresh" class="flex items-center gap-1.5 md:gap-2 px-2 py-1.5 md:px-3 md:py-2 bg-navy border border-industrial-gray text-slate-400 hover:text-gold hover:border-gold transition-all group">
                 <span class="material-symbols-outlined text-xs md:text-sm group-active:rotate-180 transition-transform duration-500">refresh</span>
-                <span class="text-[9px] font-black uppercase tracking-widest hidden sm:block">Refrescar</span>
+                <span class="text-[9px] font-black uppercase tracking-widest hidden md:inline">Refrescar</span>
             </button>
-            <div class="text-right hidden sm:block">
+            <div class="text-right hidden md:block">
                 <div class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Tasa BCV</div>
                 <div id="tasa-display" class="text-xs font-bold text-gold uppercase">${formatCurrency(tasa)} Bs.</div>
             </div>
