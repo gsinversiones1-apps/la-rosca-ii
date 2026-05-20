@@ -1,5 +1,6 @@
 /**
  * Componente Sidebar para el SaaS
+ * Lógica de Control de Acceso (RBAC): Oculta de forma nativa Dashboard y Configuración para el rol Vendedor.
  */
 
 export const renderSidebar = (storeName = "GLOBAL POS", userRole = 'vendedor') => {
