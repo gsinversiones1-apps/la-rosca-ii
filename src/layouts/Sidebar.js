@@ -3,7 +3,15 @@
  */
 
 export const renderSidebar = (storeName = "GLOBAL POS", userRole = 'vendedor') => {
-    const settingsButton = userRole === 'admin' 
+    const isAdmin = userRole === 'admin';
+    
+    const dashboardButton = isAdmin 
+        ? `<button id="nav-dashboard" class="w-full text-left text-slate-400 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all">
+                <span class="material-symbols-outlined">dashboard</span> Dashboard
+           </button>`
+        : '';
+
+    const settingsButton = isAdmin 
         ? `<a id="btn-open-settings" class="text-slate-400 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all mt-10 cursor-pointer">
                 <span class="material-symbols-outlined text-sm text-gold">settings</span> Configuración
            </a>`
@@ -22,10 +30,8 @@ export const renderSidebar = (storeName = "GLOBAL POS", userRole = 'vendedor') =
         <nav class="flex-1 py-4 overflow-y-auto custom-scrollbar">
             <div class="px-4 py-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">General</div>
             
-            <button id="nav-dashboard" class="w-full text-left text-slate-400 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all">
-                <span class="material-symbols-outlined">dashboard</span> Dashboard
-            </button>
-
+            ${dashboardButton}
+ 
             <button id="nav-inventory" class="w-full text-left text-slate-400 px-4 py-3 flex items-center gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all">
                 <span class="material-symbols-outlined">inventory_2</span> Inventario
             </button>

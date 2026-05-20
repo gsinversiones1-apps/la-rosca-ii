@@ -352,7 +352,7 @@ export function navigate(page) {
         contentArea.innerHTML = renderInventoryPage(GlobalState.userRole);
         applyFilters();
     } else if (page === 'dashboard') {
-        contentArea.innerHTML = renderDashboardPage();
+        contentArea.innerHTML = renderDashboardPage(GlobalState.userRole);
         loadDashboardData();
     } else if (page === 'clients') {
         contentArea.innerHTML = renderClientsPage();
@@ -413,44 +413,53 @@ async function loadDashboardData() {
         const data = await getDashboardData();
         
         // Formatear KPIs
-        document.getElementById('kpi-ventas').innerText = `$${data.kpis.ventas_hoy.toFixed(2)}`;
-        document.getElementById('kpi-tickets').innerText = data.kpis.tickets;
-        document.getElementById('kpi-margen').innerText = `$${data.kpis.margen.toFixed(2)}`;
+        const salesEl = document.getElementById('kpi-ventas');
+        if (salesEl) salesEl.innerText = `$${data.kpis.ventas_hoy.toFixed(2)}`;
+        
+        const ticketsEl = document.getElementById('kpi-tickets');
+        if (ticketsEl) ticketsEl.innerText = data.kpis.tickets;
+        
+        const margenEl = document.getElementById('kpi-margen');
+        if (margenEl) margenEl.innerText = `$${data.kpis.margen.toFixed(2)}`;
 
         // Renderizar Alertas de Reposición
         const insightReposicion = document.getElementById('insight-reposicion');
-        if (data.alertas_reposicion.length === 0) {
-            insightReposicion.innerHTML = '<div class="text-green-500 text-sm font-bold flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span> Inventario saludable</div>';
-        } else {
-            insightReposicion.innerHTML = data.alertas_reposicion.map(item => `
-                <div class="bg-black/30 p-3 rounded-sm border border-red-900/30 flex justify-between items-center group hover:border-red-500 transition-colors">
-                    <div>
-                        <div class="text-white text-sm font-bold">${item.producto}</div>
-                        <div class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Stock Crítico: <span class="text-red-500 font-bold">${item.stock} uds</span></div>
+        if (insightReposicion) {
+            if (data.alertas_reposicion.length === 0) {
+                insightReposicion.innerHTML = '<div class="text-green-500 text-sm font-bold flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span> Inventario saludable</div>';
+            } else {
+                insightReposicion.innerHTML = data.alertas_reposicion.map(item => `
+                    <div class="bg-black/30 p-3 rounded-sm border border-red-900/30 flex justify-between items-center group hover:border-red-500 transition-colors">
+                        <div>
+                            <div class="text-white text-sm font-bold">${item.producto}</div>
+                            <div class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Stock Crítico: <span class="text-red-500 font-bold">${item.stock} uds</span></div>
+                        </div>
+                        <div class="text-red-500 text-[10px] uppercase font-bold text-right">
+                            Compra antes de<br/>48H
+                        </div>
                     </div>
-                    <div class="text-red-500 text-[10px] uppercase font-bold text-right">
-                        Compra antes de<br/>48H
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
 
         // Renderizar Dinero Estancado
         const insightEstancado = document.getElementById('insight-estancado');
-        if (data.dinero_estancado.length === 0) {
-            insightEstancado.innerHTML = '<div class="text-green-500 text-sm font-bold flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span> Flujo de ventas óptimo</div>';
-        } else {
-            insightEstancado.innerHTML = data.dinero_estancado.map(item => `
-                <div class="bg-black/30 p-3 rounded-sm border border-orange-900/30 flex justify-between items-center group hover:border-orange-500 transition-colors">
-                    <div>
-                        <div class="text-white text-sm font-bold">${item.producto}</div>
-                        <div class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Stock Alto: <span class="text-orange-400 font-bold">${item.stock} uds</span></div>
+        if (insightEstancado) {
+            if (data.dinero_estancado.length === 0) {
+                insightEstancado.innerHTML = '<div class="text-green-500 text-sm font-bold flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span> Flujo de ventas óptimo</div>';
+            } else {
+                insightEstancado.innerHTML = data.dinero_estancado.map(item => `
+                    <div class="bg-black/30 p-3 rounded-sm border border-orange-900/30 flex justify-between items-center group hover:border-orange-500 transition-colors">
+                        <div>
+                            <div class="text-white text-sm font-bold">${item.producto}</div>
+                            <div class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Stock Alto: <span class="text-orange-400 font-bold">${item.stock} uds</span></div>
+                        </div>
+                        <div class="text-orange-400 text-[10px] uppercase font-bold text-right">
+                            0 ventas<br/>en 7 días
+                        </div>
                     </div>
-                    <div class="text-orange-400 text-[10px] uppercase font-bold text-right">
-                        0 ventas<br/>en 7 días
-                    </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
     } catch (error) {
         console.error('Error cargando Dashboard:', error);
