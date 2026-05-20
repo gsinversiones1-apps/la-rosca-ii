@@ -205,7 +205,7 @@ function debounce(func, wait) {
     };
 }
 
-const performSearch = debounce((query) => {
+const performSearch = (query) => {
     const resultsCount = document.getElementById('results-count');
     if (resultsCount) resultsCount.innerText = 'Buscando...';
 
@@ -239,7 +239,7 @@ const performSearch = debounce((query) => {
     } catch (error) {
         console.error('Error en búsqueda inteligente:', error);
     }
-}, 150);
+};
 
 export function navigate(page) {
     const contentArea = document.getElementById('content-area');
