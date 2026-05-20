@@ -119,9 +119,10 @@ async function initApp() {
             updateState('allClients', clients);
             await saveProductsLocal(products); // Actualizar caché
             
-            // Si estábamos offline y ya cargó la UI local, refrescamos el grid silenciosamente
+            // Si estábamos offline y ya cargó la UI local, refrescamos las vistas silenciosamente
             if (localProducts && localProducts.length > 0) {
                 renderProductsInGrid();
+                renderInventoryTable();
             } else {
                 navigate('pos');
             }
@@ -576,7 +577,11 @@ async function handleCheckout(isConsumidorFinal = false) {
     }
 }
 
+let eventsSetup = false;
 function setupGlobalEvents() {
+    if (eventsSetup) return;
+    eventsSetup = true;
+    
     // Escuchar eventos globales para actualizaciones UI
     window.addEventListener('sync-queue-updated', updateSyncBadge);
     window.addEventListener('local-stock-updated', renderProductsInGrid);
