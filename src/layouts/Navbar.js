@@ -33,7 +33,7 @@ export const renderNavbar = (storeName, tasa, user = null, userRole = '') => {
             </div>
         </div>
         
-        <!-- Buscador Responsivo: En móvil se posiciona de forma absoluta abajo del header al desplegarse -->
+        <!-- Buscador Responsivo -->
         <div id="search-container" class="hidden md:block flex-1 max-w-xs md:max-w-xl mx-2 md:mx-8 absolute md:relative top-full md:top-auto inset-x-0 md:inset-x-auto md:w-auto bg-dark-gray md:bg-transparent px-4 py-2 md:p-0 border-b md:border-b-0 border-industrial-gray z-20">
             <div class="relative group">
                 <span class="material-symbols-outlined absolute left-2.5 top-2 md:top-2.5 text-slate-500 group-focus-within:text-gold transition-colors text-sm md:text-base">search</span>

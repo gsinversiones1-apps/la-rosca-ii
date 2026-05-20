@@ -19,7 +19,7 @@ export const renderCartSidebar = () => {
             <span class="bg-gold text-navy text-[10px] font-black px-2 py-0.5 rounded-full">${GlobalState.cart.length}</span>
         </div>
  
-        <!-- ITEMS: Altura maxima controlada en moviles para no empujar el checkout -->
+        <!-- Items del Carrito -->
         <div id="cart-items-container" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar max-h-[calc(100dvh-420px)] lg:max-h-none">
             ${GlobalState.cart.length === 0 ? `
                 <div class="flex flex-col items-center justify-center h-48 lg:h-full text-slate-500 opacity-30">
@@ -29,7 +29,7 @@ export const renderCartSidebar = () => {
             ` : GlobalState.cart.map(item => renderCartItem(item)).join('')}
         </div>
  
-        <!-- TOTALES Y CHECKOUT: Sticky footer siempre visible -->
+        <!-- Totales y Checkout (Sticky Footer) -->
         <div class="p-4 md:p-6 bg-dark-gray border-t border-industrial-gray space-y-3 sticky bottom-0 z-20 flex-shrink-0">
             
             <!-- Selector de Divisas/Bolívares (IGTF) -->
