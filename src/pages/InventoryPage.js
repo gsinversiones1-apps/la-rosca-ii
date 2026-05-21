@@ -11,7 +11,7 @@ export const renderInventoryPage = (userRole) => {
 
     return `
     <div id="view-inventory" class="view-content animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
             <div>
                 <h2 class="font-headline text-lg text-white uppercase tracking-wider border-l-4 border-gold pl-3">Gestión de Inventario</h2>
                 <p class="text-[11px] text-slate-500 mt-1 uppercase tracking-wide">Administra tus productos, precios y existencias</p>

@@ -169,16 +169,20 @@ function updateCartUI() {
     const container = document.getElementById('layout-cart-sidebar');
     if (container) container.innerHTML = renderCartSidebar();
 
-    // Actualizar badge móvil del carrito
+    // Actualizar badge móvil del carrito (Tanto del Menú Lateral como del Header)
     const mobileBadge = document.getElementById('mobile-cart-badge');
-    if (mobileBadge) {
-        if (GlobalState.cart.length > 0) {
-            mobileBadge.innerText = GlobalState.cart.length;
-            mobileBadge.classList.remove('hidden');
-        } else {
-            mobileBadge.classList.add('hidden');
+    const mobileHeaderBadge = document.getElementById('mobile-cart-badge-header');
+    
+    [mobileBadge, mobileHeaderBadge].forEach(badge => {
+        if (badge) {
+            if (GlobalState.cart.length > 0) {
+                badge.innerText = GlobalState.cart.length;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
-    }
+    });
 }
 
 function updateStatus(text, color) {
@@ -730,7 +734,7 @@ function setupGlobalEvents() {
             return;
         }
 
-        if (e.target.closest('#btn-mobile-cart')) {
+        if (e.target.closest('#btn-mobile-cart') || e.target.closest('#btn-mobile-cart-header')) {
             document.getElementById('cart-sidebar').classList.toggle('translate-x-full');
             const overlay = document.getElementById('mobile-overlay');
             overlay.classList.remove('hidden');
