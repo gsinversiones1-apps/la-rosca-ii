@@ -260,6 +260,10 @@ function getMatchScore(product, queryTerms) {
     return totalScore;
 }
 
+/**
+ * Punto Único de Verdad de Renderizado del Catálogo y Filtros.
+ * Combina de forma reactiva el filtro por categorías y la búsqueda inteligente.
+ */
 const applyFilters = () => {
     const searchInput = document.getElementById('search-input');
     const categorySelect = document.getElementById('filter-category');
@@ -315,6 +319,10 @@ const performSearch = debounce((query) => {
     applyFilters();
 }, 75);
 
+/**
+ * Navegación y Enrutamiento del POS.
+ * RBAC Guard: Restringe el acceso al Dashboard a usuarios con rol 'admin'.
+ */
 export function navigate(page) {
     const contentArea = document.getElementById('content-area');
     if (!contentArea) return;
