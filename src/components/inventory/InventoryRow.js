@@ -23,7 +23,7 @@ export const renderInventoryRow = (product, userRole) => {
         <td class="px-6 py-4">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded bg-navy border border-industrial-gray overflow-hidden">
-                    <img src="${product.image_url || 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=50'}" class="w-full h-full object-cover opacity-60"/>
+                    <img src="${product.image_url || '/assets/tornillo_tuerca_4k.png'}" class="w-full h-full object-cover opacity-60"/>
                 </div>
                 <span class="font-bold uppercase tracking-wide">${product.nombre}</span>
             </div>

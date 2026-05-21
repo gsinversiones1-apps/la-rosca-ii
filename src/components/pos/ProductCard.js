@@ -5,7 +5,7 @@ import { formatCurrency } from '../../utils/formatters.js';
 
 export const renderProductCard = (product, inCartCount = 0) => {
     const availableStock = product.stock - inCartCount;
-    const imgUrl = product.image_url || "https://images.unsplash.com/photo-1581244277943-fe4a9c777189?auto=format&fit=crop&q=80&w=400";
+    const imgUrl = product.image_url || "/assets/tornillo_tuerca_4k.png";
     
     return `
     <div class="bg-dark-gray border border-industrial-gray group hover:border-gold transition-all duration-300 shadow-lg">

@@ -7,7 +7,7 @@ export const renderCartItem = (item) => {
     return `
     <div class="bg-navy/40 border border-industrial-gray p-3 flex gap-3 group animate-in slide-in-from-right-2 duration-300">
         <div class="w-12 h-12 bg-background border border-industrial-gray overflow-hidden">
-            <img src="${item.image_url || 'https://images.unsplash.com/photo-1581244277943-fe4a9c777189?w=100'}" class="w-full h-full object-cover opacity-70"/>
+            <img src="${item.image_url || '/assets/tornillo_tuerca_4k.png'}" class="w-full h-full object-cover opacity-70"/>
         </div>
         <div class="flex-1">
             <h4 class="text-[10px] font-bold text-white uppercase truncate">${item.nombre}</h4>
