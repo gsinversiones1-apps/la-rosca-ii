@@ -723,16 +723,7 @@ function setupGlobalEvents() {
             return;
         }
 
-        if (e.target.closest('#btn-mobile-search')) {
-            const searchContainer = document.getElementById('search-container');
-            if (searchContainer) {
-                searchContainer.classList.toggle('hidden');
-                if (!searchContainer.classList.contains('hidden')) {
-                    document.getElementById('search-input')?.focus();
-                }
-            }
-            return;
-        }
+
 
         if (e.target.closest('#btn-mobile-cart') || e.target.closest('#btn-mobile-cart-header')) {
             document.getElementById('cart-sidebar').classList.toggle('translate-x-full');
