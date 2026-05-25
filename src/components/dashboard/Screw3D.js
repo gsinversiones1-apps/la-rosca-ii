@@ -74,6 +74,7 @@ export function initScrew3D(containerId, skeletonId) {
     const radioNucleo = 0.5; 
     const largoVastago = 4.0;
     const radioRoscaExterior = 0.68; 
+    const pasoRosca = 0.2; // Añadido para sincronizar la tuerca
 
     // 1. VÁSTAGO (NÚCLEO)
     const cuerpoGeo = new THREE.CylinderGeometry(radioNucleo, radioNucleo, largoVastago, 45);
@@ -155,7 +156,7 @@ export function initScrew3D(containerId, skeletonId) {
         const vueltas = 18; 
         const segs = 100; 
         const total = vueltas * segs;
-        const paso = 3.6 / vueltas; 
+        const paso = pasoRosca; 
         const yInicio = -1.8; 
         
         for (let i = 0; i <= total; i++) {
@@ -247,6 +248,39 @@ export function initScrew3D(containerId, skeletonId) {
         tornillo.add(textoGroup);
     });
 
+    // --- 6. TUERCA ANIMADA ---
+    const nutShape = new THREE.Shape();
+    const nutOuterRadius = 1.0;
+    for (let i = 0; i < 6; i++) {
+        const a = i * Math.PI / 3;
+        if (i === 0) nutShape.moveTo(Math.cos(a) * nutOuterRadius, Math.sin(a) * nutOuterRadius);
+        else nutShape.lineTo(Math.cos(a) * nutOuterRadius, Math.sin(a) * nutOuterRadius);
+    }
+    nutShape.lineTo(Math.cos(0) * nutOuterRadius, Math.sin(0) * nutOuterRadius);
+    
+    const holePath = new THREE.Path();
+    // El agujero es un poco más ancho que la rosca exterior para evitar z-fighting
+    holePath.absarc(0, 0, radioRoscaExterior + 0.05, 0, Math.PI * 2, false);
+    nutShape.holes.push(holePath);
+
+    const extrudeSettings = {
+        depth: 0.5,
+        bevelEnabled: true,
+        bevelSegments: 2,
+        steps: 1,
+        bevelSize: 0.05,
+        bevelThickness: 0.05
+    };
+    
+    const nutGeo = new THREE.ExtrudeGeometry(nutShape, extrudeSettings);
+    // ExtrudeGeometry crece hacia +Z. Centramos el grosor en Z=0
+    nutGeo.translate(0, 0, -0.25);
+    // Rotamos para alinear con el eje Y del tornillo
+    nutGeo.rotateX(Math.PI / 2);
+    
+    const tuerca = new THREE.Mesh(nutGeo, matPremium);
+    tornillo.add(tuerca);
+
     // --- OPTIMIZACIÓN DE RENDIMIENTO (ResizeObserver) ---
     const resizeObserver = new ResizeObserver(entries => {
         for (let entry of entries) {
@@ -263,10 +297,18 @@ export function initScrew3D(containerId, skeletonId) {
     // --- ANIMACIÓN ---
     let frameId;
     let hasFadedIn = false;
+    let nutTime = 0;
 
     function animate() {
         frameId = requestAnimationFrame(animate);
         tornillo.rotation.y += 0.005; // Rotación suave
+        
+        // --- Lógica de la Tuerca Animada ---
+        nutTime += 0.015; // Velocidad del movimiento de la tuerca
+        let nutY = Math.sin(nutTime) * 1.3; // Oscila entre -1.3 y 1.3
+        tuerca.position.y = nutY;
+        tuerca.rotation.y = (nutY / pasoRosca) * Math.PI * 2; // Rota en perfecta sincronía con los hilos
+
         controls.update();
         renderer.render(scene, camera);
 
