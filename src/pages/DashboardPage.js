@@ -57,15 +57,15 @@ export const renderDashboardPage = (userRole = 'vendedor') => {
                 </div>
             </div>
 
-            <!-- Contenedor del Modelo 3D (Spline) -->
-            <div id="spline-wrapper" class="hidden xl:flex w-80 h-64 relative items-center justify-center shrink-0">
+            <!-- Contenedor del Modelo 3D (Three.js Screw) -->
+            <div id="screw-wrapper" class="hidden xl:flex w-80 h-64 relative items-center justify-center shrink-0">
                 <!-- Skeleton Screen (Spinner Dorado) -->
-                <div id="spline-skeleton" class="absolute inset-0 flex flex-col items-center justify-center bg-transparent z-10 transition-opacity duration-700">
+                <div id="screw-skeleton" class="absolute inset-0 flex flex-col items-center justify-center bg-transparent z-10 transition-opacity duration-700">
                     <div class="w-14 h-14 border-4 border-gold/20 border-t-gold rounded-full animate-spin mb-3"></div>
                     <span class="text-[10px] font-bold text-gold uppercase tracking-widest animate-pulse">Cargando 3D...</span>
                 </div>
-                <!-- Div donde se inyectará el visor para Lazy Loading -->
-                <div id="spline-container" class="w-full h-full relative z-20 pointer-events-auto" style="background: transparent;"></div>
+                <!-- Div donde se renderizará el canvas de Three.js -->
+                <div id="screw-container" class="w-full h-full relative z-20 pointer-events-auto" style="background: transparent; opacity: 0; transition: opacity 1s ease-in;"></div>
             </div>
             
         </div>

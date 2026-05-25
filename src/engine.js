@@ -18,6 +18,7 @@ import { renderInventoryPage } from './pages/InventoryPage.js';
 import { renderDashboardPage } from './pages/DashboardPage.js';
 import { getDashboardData } from './api/dashboard.js';
 import { renderProductCard } from './components/pos/ProductCard.js';
+import { initScrew3D } from './components/dashboard/Screw3D.js';
 import { renderInventoryRow } from './components/inventory/InventoryRow.js';
 import { renderCartSidebar } from './components/pos/CartSidebar.js';
 import { renderClientModal, setupClientModalValidation } from './components/pos/ClientModal.js';
@@ -484,8 +485,22 @@ async function loadDashboardData() {
         // Inicializar Gráficos Avanzados
         initAdvancedDashboardAnalytics(data);
         
-        // Inicializar modelo 3D Spline
-        initSplineViewer();
+        // Inicializar modelo 3D Nativo (Three.js) con Lazy Loading
+        const screwWrapper = document.getElementById('screw-wrapper');
+        const screwContainer = document.getElementById('screw-container');
+        
+        if (screwWrapper && screwContainer && screwContainer.innerHTML === '') {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        initScrew3D('screw-container', 'screw-skeleton');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '100px' });
+            
+            observer.observe(screwWrapper);
+        }
 
     } catch (error) {
         console.error('Error cargando Dashboard:', error);
@@ -498,51 +513,6 @@ async function loadDashboardData() {
 // Variables Globales para Gráficos para poder destruirlos al cambiar de vista o rango
 let pulsoVentasChartInstance = null;
 let topCategoriasChartInstance = null;
-
-function initSplineViewer() {
-    const splineContainer = document.getElementById('spline-container');
-    const skeleton = document.getElementById('spline-skeleton');
-    
-    if (!splineContainer) return;
-
-    // URL Placeholder de Spline (Reemplazar con la URL real de "El Tornillo")
-    const splineUrl = 'https://prod.spline.design/6Wq1Q7YGyM-iab9i/scene.splinecode'; 
-
-    // 1. Lazy Loading con IntersectionObserver
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                // Inyectar el tag <spline-viewer>
-                if (splineContainer.innerHTML === '') {
-                    // Se usa pointer-events-none inicialmente para que no interfiera en la carga inicial
-                    const viewerHtml = `
-                        <spline-viewer 
-                            url="${splineUrl}" 
-                            class="w-full h-full"
-                            style="background: transparent;"
-                            zoom-control="false"
-                            pan-control="false"
-                        ></spline-viewer>
-                    `;
-                    splineContainer.innerHTML = viewerHtml;
-
-                    const splineEl = splineContainer.querySelector('spline-viewer');
-                    
-                    // 2. Escuchar el evento de carga completa de Spline
-                    splineEl.addEventListener('load-complete', () => {
-                        if (skeleton) {
-                            skeleton.style.opacity = '0';
-                            setTimeout(() => skeleton.remove(), 700); // Remover del DOM tras el fade out
-                        }
-                    });
-                }
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { rootMargin: '100px' }); // Cargar 100px antes de que entre a la pantalla
-
-    observer.observe(document.getElementById('spline-wrapper') || splineContainer);
-}
 
 function initAdvancedDashboardAnalytics(realData) {
     // 1. Configuración de Datos Mock
