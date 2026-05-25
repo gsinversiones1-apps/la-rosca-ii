@@ -329,6 +329,8 @@ const performSearch = debounce((query) => {
     applyFilters();
 }, 75);
 
+let currentScrewCleanup = null;
+
 /**
  * Navegación y Enrutamiento del POS.
  * RBAC Guard: Restringe el acceso al Dashboard a usuarios con rol 'admin'.
@@ -337,6 +339,11 @@ export function navigate(page) {
     const contentArea = document.getElementById('content-area');
     if (!contentArea) return;
     
+    if (currentScrewCleanup) {
+        currentScrewCleanup();
+        currentScrewCleanup = null;
+    }
+
     // Auth Guards
     if (!GlobalState.session) {
         alert("Debe iniciar sesión primero.");
@@ -366,6 +373,22 @@ export function navigate(page) {
     if (page === 'pos') {
         contentArea.innerHTML = renderPOSPage();
         applyFilters();
+        
+        // Inicializar modelo 3D Nativo (Three.js) en POS
+        const posScrewWrapper = document.getElementById('pos-screw-wrapper');
+        const posScrewContainer = document.getElementById('pos-screw-container');
+        if (posScrewWrapper && posScrewContainer) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        currentScrewCleanup = initScrew3D('pos-screw-container', 'pos-screw-skeleton');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { rootMargin: '100px' });
+            observer.observe(posScrewWrapper);
+        }
+        
     } else if (page === 'inventory') {
         contentArea.innerHTML = renderInventoryPage(GlobalState.userRole);
         applyFilters();
@@ -493,7 +516,7 @@ async function loadDashboardData() {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        initScrew3D('screw-container', 'screw-skeleton');
+                        currentScrewCleanup = initScrew3D('screw-container', 'screw-skeleton');
                         observer.unobserve(entry.target);
                     }
                 });

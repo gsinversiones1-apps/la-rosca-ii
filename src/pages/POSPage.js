@@ -2,14 +2,20 @@
  * Página Principal del Punto de Venta (POS)
  */
 
-import { renderSplineCanvas } from '../components/SplineCanvas.js';
-
 export const renderPOSPage = () => {
     return `
     <div id="view-pos" class="view-content animate-in fade-in slide-in-from-bottom-4 duration-500">
         
-        <!-- WOW Factor: Experiencia 3D (Se esconde si hay error de red, pero muestra el elegante placeholder) -->
-        ${renderSplineCanvas()}
+        <!-- WOW Factor: Experiencia 3D (Tornillo Nativo) -->
+        <div id="pos-screw-wrapper" class="w-full h-64 sm:h-80 md:h-[400px] rounded-2xl relative overflow-hidden mb-8 border border-gold/10 shadow-[inset_0_0_40px_rgba(0,0,0,0.8)] flex items-center justify-center shrink-0" style="background: linear-gradient(145deg, #1A253C, #0F1626);">
+            <!-- Skeleton Screen (Spinner Dorado) -->
+            <div id="pos-screw-skeleton" class="absolute inset-0 flex flex-col items-center justify-center bg-transparent z-10 transition-opacity duration-700">
+                <div class="w-14 h-14 border-4 border-gold/20 border-t-gold rounded-full animate-spin mb-3"></div>
+                <span class="text-[10px] font-bold text-gold uppercase tracking-widest animate-pulse">Cargando 3D...</span>
+            </div>
+            <!-- Div donde se renderizará el canvas de Three.js -->
+            <div id="pos-screw-container" class="w-full h-full relative z-20 pointer-events-auto" style="background: transparent; opacity: 0; transition: opacity 1s ease-in;"></div>
+        </div>
 
         <div class="flex flex-col gap-4 md:flex-row md:justify-between md:items-end mb-6 min-w-0 w-full">
             <div class="min-w-0">
