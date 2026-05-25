@@ -5,7 +5,7 @@ export const renderDashboardPage = (userRole = 'vendedor') => {
     <div id="view-dashboard" class="view-content animate-in fade-in slide-in-from-bottom-4 duration-500 p-6">
         
         <!-- Header & KPIs & 3D Model Area -->
-        <div class="flex flex-col xl:flex-row gap-6 mb-8 max-w-7xl items-start">
+        <div class="flex flex-col lg:flex-row gap-6 mb-8 max-w-7xl items-start">
             
             <div class="flex-1 w-full">
                 <!-- Encabezado Principal Premium -->
@@ -58,7 +58,7 @@ export const renderDashboardPage = (userRole = 'vendedor') => {
             </div>
 
             <!-- Contenedor del Modelo 3D (Three.js Screw) -->
-            <div id="screw-wrapper" class="hidden xl:flex w-80 h-64 relative items-center justify-center shrink-0">
+            <div id="screw-wrapper" class="hidden lg:flex w-full md:w-80 h-64 relative items-center justify-center shrink-0 mt-4 lg:mt-0 mx-auto">
                 <!-- Skeleton Screen (Spinner Dorado) -->
                 <div id="screw-skeleton" class="absolute inset-0 flex flex-col items-center justify-center bg-transparent z-10 transition-opacity duration-700">
                     <div class="w-14 h-14 border-4 border-gold/20 border-t-gold rounded-full animate-spin mb-3"></div>
