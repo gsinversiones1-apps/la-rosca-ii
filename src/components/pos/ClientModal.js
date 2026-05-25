@@ -138,7 +138,7 @@ export const setupClientModalValidation = () => {
 
     // Función para sanear y normalizar nombres
     const sanitizeName = (val) => {
-        return val.toUpperCase().replace(/[^A-ZÁÉÍÓÚÑ \\.]/gi, '');
+        return val.toUpperCase().replace(/[^A-ZÁÉÍÓÚÑ .]/gi, '');
     };
 
     [nombreInput, apellidoInput, dirInput].forEach(input => {
@@ -153,7 +153,7 @@ export const setupClientModalValidation = () => {
             e.target.setSelectionRange(start, start);
         });
         input.addEventListener('blur', (e) => {
-            e.target.value = e.target.value.trim().replace(/\\s{2,}/g, ' ');
+            e.target.value = e.target.value.trim().replace(/\s{2,}/g, ' ');
         });
     });
 
@@ -161,7 +161,7 @@ export const setupClientModalValidation = () => {
         if (!prefixSelect || !docInput) return;
         
         const prefix = prefixSelect.value;
-        let rawNum = docInput.value.replace(/\\D/g, ''); // Solo extraer números
+        let rawNum = docInput.value.replace(/\D/g, ''); // Solo extraer números
         
         // Determinar UI Dinámica de Nombres
         const isJuridico = ['J', 'G'].includes(prefix);
@@ -186,13 +186,13 @@ export const setupClientModalValidation = () => {
         if (['V', 'E'].includes(prefix) && rawNum) {
             // Formatear con puntos de miles para V y E
             formatted = new Intl.NumberFormat('es-VE').format(rawNum);
-            if (hiddenRifInput) hiddenRifInput.value = \`\${prefix}-\${rawNum}\`;
+            if (hiddenRifInput) hiddenRifInput.value = `${prefix}-${rawNum}`;
         } else if (['J', 'G'].includes(prefix) && rawNum) {
             // Formato J-12345678-0
             if (rawNum.length > 8) {
-                formatted = \`\${rawNum.slice(0, 8)}-\${rawNum.slice(8, 9)}\`;
+                formatted = `${rawNum.slice(0, 8)}-${rawNum.slice(8, 9)}`;
             }
-            if (hiddenRifInput) hiddenRifInput.value = \`\${prefix}-\${rawNum}\`;
+            if (hiddenRifInput) hiddenRifInput.value = `${prefix}-${rawNum}`;
         } else {
             if (hiddenRifInput) hiddenRifInput.value = prefix;
         }
@@ -253,9 +253,9 @@ export const setupClientModalValidation = () => {
 
     if (telInput) {
         telInput.addEventListener('input', (e) => {
-            let val = e.target.value.replace(/\\D/g, '');
+            let val = e.target.value.replace(/\D/g, '');
             if (val.length > 4) {
-                e.target.value = \`\${val.slice(0, 4)}-\${val.slice(4, 11)}\`;
+                e.target.value = `${val.slice(0, 4)}-${val.slice(4, 11)}`;
             } else {
                 e.target.value = val;
             }
