@@ -5,7 +5,7 @@
 
 import { GlobalState, updateState } from './context/State.js';
 import { fetchTasaBCV } from './api/bcv.js';
-import { getProductsByTenant, getSession, getUserProfile, signIn, signOut } from './api/supabaseClient.js';
+import { getProductsByTenant, getSession, getUserProfile, signIn, signOut, insertProduct } from './api/supabaseClient.js';
 import { getClients, createClient } from './api/clients.js';
 import { saveSale } from './api/sales.js';
 import { getPendingSales, saveProductsLocal, getProductsLocal } from './utils/db.js';
@@ -1020,6 +1020,22 @@ function setupGlobalEvents() {
             icon.classList.remove('animate-spin');
         }
 
+        // Modal de Nuevo Producto (Inventario)
+        if (e.target.closest('#btn-add-product')) {
+            const modal = document.getElementById('modal-add-product');
+            if (modal) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                document.getElementById('modal-add-product-content').classList.remove('scale-95');
+            }
+        }
+        if (e.target.closest('#btn-close-modal-product') || e.target.closest('#btn-cancel-product')) {
+            const modal = document.getElementById('modal-add-product');
+            if (modal) {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('modal-add-product-content').classList.add('scale-95');
+            }
+        }
+
         // Checkout - Consumidor Final
         if (e.target.closest('#btn-checkout-consumidor-final')) {
             e.preventDefault();
@@ -1240,6 +1256,40 @@ function setupGlobalEvents() {
                 
                 document.getElementById('modal-wrapper').innerHTML = '';
             } catch (err) { console.error('Error al guardar cliente:', err); }
+        }
+        
+        if (e.target.id === 'form-add-product') {
+            e.preventDefault();
+            const saveBtn = document.getElementById('btn-save-product');
+            saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Guardando...';
+            saveBtn.disabled = true;
+
+            const newProduct = {
+                codigo_skv: document.getElementById('add-prod-sku').value.toUpperCase(),
+                nombre: document.getElementById('add-prod-nombre').value.toUpperCase(),
+                area: document.getElementById('add-prod-area').value.toUpperCase(),
+                medida: 'N/A', // O podríamos agregarlo al form
+                precio_usd: parseFloat(document.getElementById('add-prod-precio').value),
+                stock: parseInt(document.getElementById('add-prod-stock').value, 10),
+                image_url: document.getElementById('add-prod-image').value || null
+            };
+
+            try {
+                await insertProduct(newProduct);
+                alert("Producto agregado exitosamente.");
+                // Limpiar form y cerrar
+                e.target.reset();
+                document.getElementById('modal-add-product').classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('modal-add-product-content').classList.add('scale-95');
+                // Recargar inventario si es necesario
+                location.reload(); 
+            } catch (err) {
+                console.error(err);
+                alert("Error al agregar producto: " + err.message);
+            } finally {
+                saveBtn.innerHTML = 'Guardar Producto <span class="material-symbols-outlined text-sm">save</span>';
+                saveBtn.disabled = false;
+            }
         }
     });
 

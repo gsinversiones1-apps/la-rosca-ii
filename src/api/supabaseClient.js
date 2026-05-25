@@ -48,3 +48,18 @@ export const getProductsByTenant = async (tenantId) => {
     if (error) throw error;
     return data;
 };
+
+/**
+ * Inserta un nuevo producto en la base de datos (Admin)
+ */
+export const insertProduct = async (productData) => {
+    // Generar ID único usando el timestamp para mock si es necesario, 
+    // o dejar que Supabase lo asigne si es UUID
+    const { data, error } = await supabase
+        .from('productos')
+        .insert([productData])
+        .select();
+
+    if (error) throw error;
+    return data;
+};
