@@ -1,7 +1,5 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { FontLoader } from 'three/addons/loaders/FontLoader.js';
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 /**
  * Inicializa y renderiza un tornillo 3D (Three.js) en un contenedor específico.
@@ -141,7 +139,7 @@ export function initScrew3D(containerId, skeletonId) {
     scene.add(tornillo);
 
     // 5. INSCRIPCIÓN EN ALTO RELIEVE (TEXTO 3D CIRCULAR)
-    const loader = new FontLoader();
+    const loader = new THREE.FontLoader();
     loader.load('https://unpkg.com/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
         const texto = 'TORNILLERIA LA ROSCA II  •  '; 
         const radioTexto = 0.65; // Sobre la cara hexagonal
@@ -158,7 +156,7 @@ export function initScrew3D(containerId, skeletonId) {
             const char = texto[i];
             if (char === ' ') continue;
 
-            const charGeo = new TextGeometry(char, {
+            const charGeo = new THREE.TextGeometry(char, {
                 font: font,
                 size: 0.12,
                 height: 0.05, // Efecto ALTO RELIEVE real
