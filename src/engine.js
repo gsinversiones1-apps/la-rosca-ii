@@ -1002,7 +1002,15 @@ function setupGlobalEvents() {
         if (e.target.closest('#nav-inventory')) { navigate('inventory'); closeDrawers(); }
         if (e.target.closest('#nav-dashboard')) { navigate('dashboard'); closeDrawers(); }
         if (e.target.closest('#nav-clients')) { navigate('clients'); closeDrawers(); }
-        if (e.target.closest('#header-refresh')) initApp();
+        if (e.target.closest('#header-refresh') || e.target.closest('#refresh-db')) {
+            const btn = e.target.closest('button');
+            if (btn) {
+                const icon = btn.querySelector('.material-symbols-outlined');
+                if (icon) icon.classList.add('animate-spin', 'text-gold');
+            }
+            location.reload();
+            return;
+        }
 
         // Sync manual
         if (e.target.closest('#btn-sync-queue')) {
