@@ -82,13 +82,17 @@ async function initApp() {
         }
 
         appContainer.innerHTML = `
-            <div id="mobile-overlay" class="fixed inset-0 bg-black/80 z-40 hidden transition-opacity duration-300 opacity-0 md:hidden"></div>
+            <div id="mobile-overlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 hidden transition-opacity duration-300 opacity-0 2xl:hidden"></div>
             <div id="layout-sidebar"></div>
-            <div id="main-content-wrapper" class="flex-1 md:ml-64 lg:mr-80 flex flex-col h-full bg-background transition-all duration-300 w-full relative">
+            <div id="main-content-wrapper" class="flex-1 md:ml-20 2xl:ml-64 2xl:mr-80 flex flex-col h-full bg-background transition-all duration-300 w-full relative">
                 <div id="layout-navbar"></div>
                 <main id="content-area" class="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar"></main>
             </div>
             <div id="layout-cart-sidebar"></div>
+            <button id="btn-floating-cart" class="fixed bottom-6 right-6 z-40 bg-gold text-navy w-14 h-14 rounded-full flex items-center justify-center shadow-[0_4px_20px_rgba(212,175,55,0.4)] border border-gold/30 hover:scale-110 active:scale-95 transition-all 2xl:hidden" title="Ver Carrito">
+                <span class="material-symbols-outlined text-2xl font-black">shopping_cart</span>
+                <span id="floating-cart-badge" class="absolute -top-1 -right-1 bg-red-600 text-white text-[9px] font-black w-4.5 h-4.5 rounded-full flex items-center justify-center shadow-md hidden">0</span>
+            </button>
             <div id="modal-wrapper"></div>
         `;
 
@@ -169,11 +173,12 @@ function updateCartUI() {
     const container = document.getElementById('layout-cart-sidebar');
     if (container) container.innerHTML = renderCartSidebar();
 
-    // Actualizar badge móvil del carrito (Tanto del Menú Lateral como del Header)
+    // Actualizar badge móvil del carrito y del botón flotante
     const mobileBadge = document.getElementById('mobile-cart-badge');
     const mobileHeaderBadge = document.getElementById('mobile-cart-badge-header');
+    const floatingBadge = document.getElementById('floating-cart-badge');
     
-    [mobileBadge, mobileHeaderBadge].forEach(badge => {
+    [mobileBadge, mobileHeaderBadge, floatingBadge].forEach(badge => {
         if (badge) {
             if (GlobalState.cart.length > 0) {
                 badge.innerText = GlobalState.cart.length;
@@ -725,11 +730,27 @@ function setupGlobalEvents() {
 
 
 
-        if (e.target.closest('#btn-mobile-cart') || e.target.closest('#btn-mobile-cart-header')) {
-            document.getElementById('cart-sidebar').classList.toggle('translate-x-full');
-            const overlay = document.getElementById('mobile-overlay');
-            overlay.classList.remove('hidden');
-            setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+        if (e.target.closest('#btn-mobile-cart') || e.target.closest('#btn-mobile-cart-header') || e.target.closest('#btn-floating-cart')) {
+            const cartSidebar = document.getElementById('cart-sidebar');
+            if (cartSidebar) {
+                cartSidebar.classList.toggle('translate-x-full');
+                const isOpen = !cartSidebar.classList.contains('translate-x-full');
+                const overlay = document.getElementById('mobile-overlay');
+                if (overlay) {
+                    if (isOpen) {
+                        overlay.classList.remove('hidden');
+                        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+                    } else {
+                        overlay.classList.add('opacity-0');
+                        setTimeout(() => overlay.classList.add('hidden'), 300);
+                    }
+                }
+            }
+            return;
+        }
+
+        if (e.target.closest('#btn-close-cart')) {
+            closeDrawers();
             return;
         }
 

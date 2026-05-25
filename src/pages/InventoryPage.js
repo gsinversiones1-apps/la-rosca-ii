@@ -4,7 +4,7 @@
 
 export const renderInventoryPage = (userRole) => {
     const btnNewProduct = userRole === 'admin' 
-        ? `<button id="btn-add-product" class="bg-gold text-navy px-6 py-3 font-headline text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:bg-[#E5C158] transition-all shadow-[0_4px_0_#B8962F] active:translate-y-1 active:shadow-none">
+        ? `<button id="btn-add-product" class="btn-gold-premium px-6 py-3 font-headline text-xs font-black uppercase tracking-widest flex items-center gap-2 hover:bg-[#E5C158] transition-all shadow-lg active:translate-y-1 active:shadow-none">
                 NUEVO PRODUCTO <span class="material-symbols-outlined text-sm font-black">add_box</span>
             </button>`
         : '';
@@ -19,13 +19,13 @@ export const renderInventoryPage = (userRole) => {
             ${btnNewProduct}
         </div>
 
-        <div class="bg-dark-gray border border-industrial-gray shadow-2xl table-responsive-wrapper">
-            <table class="w-full text-left min-w-[800px]">
+        <div class="bg-navy-premium border border-industrial-gray shadow-2xl table-responsive-wrapper overflow-hidden">
+            <table class="w-full text-left min-w-[600px] md:min-w-full">
                 <thead>
-                    <tr class="bg-navy border-b border-industrial-gray text-[10px] font-bold text-gold uppercase tracking-widest">
-                        <th class="px-6 py-4">SKU / Código</th>
+                    <tr class="bg-dark-gray/50 border-b border-industrial-gray text-[10px] font-bold text-gold uppercase tracking-widest">
+                        <th class="px-6 py-4 hidden md:table-cell">SKU / Código</th>
                         <th class="px-6 py-4">Producto</th>
-                        <th class="px-6 py-4">Categoría</th>
+                        <th class="px-6 py-4 hidden sm:table-cell">Categoría</th>
                         <th class="px-6 py-4">Precio (USD)</th>
                         <th class="px-6 py-4">Stock</th>
                         <th class="px-6 py-4 text-center">Acciones</th>

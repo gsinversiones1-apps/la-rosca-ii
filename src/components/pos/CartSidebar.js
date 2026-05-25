@@ -11,12 +11,17 @@ export const renderCartSidebar = () => {
     const { subtotal, iva, igtf, totalUsd, totalBs } = calculateTotals(GlobalState.tasaActual, GlobalState.cartMetodoPago);
     
     return `
-    <aside id="cart-sidebar" class="fixed right-0 top-0 h-[100dvh] w-80 bg-navy border-l border-industrial-gray shadow-2xl z-50 flex flex-col transform translate-x-full lg:translate-x-0 transition-transform duration-300">
-        <div class="p-4 md:p-6 border-b border-industrial-gray flex justify-between items-center bg-dark-gray flex-shrink-0">
-            <h3 class="font-headline text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
-                <span class="material-symbols-outlined text-gold">shopping_basket</span> Carrito
-            </h3>
-            <span class="bg-gold text-navy text-[10px] font-black px-2 py-0.5 rounded-full">${GlobalState.cart.length}</span>
+    <aside id="cart-sidebar" class="fixed right-0 top-0 h-[100dvh] w-80 bg-navy-premium border-l border-industrial-gray shadow-2xl z-50 flex flex-col transform translate-x-full 2xl:translate-x-0 transition-transform duration-300">
+        <div class="p-4 md:p-6 border-b border-industrial-gray flex justify-between items-center bg-dark-gray/60 backdrop-blur-md flex-shrink-0">
+            <div class="flex items-center gap-2">
+                <h3 class="font-headline text-sm font-black text-white uppercase tracking-widest flex items-center gap-2">
+                    <span class="material-symbols-outlined text-gold">shopping_basket</span> Carrito
+                </h3>
+                <span class="bg-gold text-navy text-[10px] font-black px-2 py-0.5 rounded-full">${GlobalState.cart.length}</span>
+            </div>
+            <button id="btn-close-cart" class="text-slate-400 hover:text-gold 2xl:hidden flex items-center justify-center p-1" title="Cerrar Carrito">
+                <span class="material-symbols-outlined text-xl">close</span>
+            </button>
         </div>
  
         <!-- Items del Carrito -->
@@ -30,7 +35,7 @@ export const renderCartSidebar = () => {
         </div>
  
         <!-- Totales y Checkout (Sticky Footer) -->
-        <div class="p-4 md:p-6 bg-dark-gray border-t border-industrial-gray space-y-3 sticky bottom-0 z-20 flex-shrink-0">
+        <div class="p-4 md:p-6 bg-dark-gray/60 backdrop-blur-md border-t border-industrial-gray space-y-3 sticky bottom-0 z-20 flex-shrink-0">
             
             <!-- Selector de Divisas/Bolívares (IGTF) -->
             <div class="bg-navy p-1.5 flex border border-industrial-gray rounded-sm mb-1">
@@ -68,7 +73,7 @@ export const renderCartSidebar = () => {
                 <span class="text-lg font-headline font-black text-white">${formatCurrency(totalBs)} <small class="text-[9px]">Bs.</small></span>
             </div>
  
-            <button id="btn-checkout" class="w-full bg-gold hover:bg-[#B8962F] text-navy py-3 md:py-4 font-headline font-black text-xs uppercase tracking-[0.2em] shadow-[0_4px_0_#B8962F] active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 flex items-center justify-center gap-2" ${GlobalState.cart.length === 0 ? 'disabled' : ''}>
+            <button id="btn-checkout" class="w-full btn-gold-premium py-3.5 md:py-4 font-headline font-black text-xs uppercase tracking-[0.2em] shadow-lg active:translate-y-1 active:shadow-none transition-all disabled:opacity-50 flex items-center justify-center gap-2" ${GlobalState.cart.length === 0 ? 'disabled' : ''}>
                 FINALIZAR VENTA
             </button>
             <button id="btn-clear-cart" class="w-full text-slate-500 hover:text-red-400 text-[9px] font-bold uppercase tracking-widest transition-colors py-1">

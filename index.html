@@ -16,6 +16,7 @@
                         'md': '768px',
                         'lg': '1024px',
                         'xl': '1280px',
+                        '2xl': '1400px', // Custom 1400px breakpoint
                     },
                     colors: {
                         background: '#0D1117',
@@ -23,12 +24,17 @@
                         gold: '#D4AF37',
                         'dark-gray': '#24292E',
                         'industrial-gray': '#30363D'
+                    },
+                    fontFamily: {
+                        mono: ['"Roboto Mono"', 'ui-monospace', 'monospace'],
+                        sans: ['"Inter"', 'sans-serif'],
+                        headline: ['"Space Grotesk"', 'sans-serif']
                     }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     
     <style>
@@ -57,6 +63,64 @@
         .bg-dark-gray { background-color: #24292E; }
         .border-industrial-gray { border-color: #30363D; }
         
+        /* Estilos de Componentes Premium (Look & Feel) */
+        
+        /* Botón Dorado Metálico Pulido Premium */
+        .btn-gold-premium {
+            background: linear-gradient(135deg, #BF953F 0%, #FCF6BA 25%, #B38728 50%, #FBF5B7 75%, #AA771C 100%);
+            background-size: 200% auto;
+            color: #0D1117 !important;
+            font-weight: 800;
+            border-radius: 12px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.3), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4),
+                0 0 0 1px rgba(212, 175, 55, 0.15);
+            text-shadow: 0 0.5px 0.5px rgba(255, 255, 255, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-gold-premium:hover {
+            background-position: right center;
+            box-shadow: 
+                0 8px 16px -4px rgba(212, 175, 55, 0.35), 
+                0 4px 6px -2px rgba(212, 175, 55, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.5),
+                0 0 0 2px rgba(212, 175, 55, 0.4);
+            transform: translateY(-1.5px);
+            filter: brightness(1.03);
+        }
+        
+        .btn-gold-premium:active {
+            transform: translateY(0.5px);
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.25),
+                inset 0 2px 4px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Contenedor Azul Marino Premium */
+        .bg-navy-premium {
+            background: linear-gradient(145deg, #1A253C, #0F1626);
+            border: 1px solid rgba(212, 175, 55, 0.12);
+            box-shadow: 
+                0 10px 25px -5px rgba(0, 0, 0, 0.45), 
+                0 8px 10px -6px rgba(0, 0, 0, 0.35),
+                inset 0 1px 1px rgba(255, 255, 255, 0.05);
+            border-radius: 14px;
+        }
+
+        /* Hover de brillo dorado metálico sutil para tarjetas */
+        .hover-gold-glow:hover {
+            border-color: rgba(212, 175, 55, 0.4);
+            box-shadow: 
+                0 10px 25px -5px rgba(0, 0, 0, 0.5), 
+                0 0 15px rgba(212, 175, 55, 0.1);
+        }
+
         /* Utilidades de Componentes Atómicos (Nivel 2) */
         .table-responsive-wrapper {
             width: 100%;

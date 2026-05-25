@@ -1,7 +1,7 @@
 export const renderLoginPage = () => {
     return `
     <div class="min-h-screen bg-background flex items-center justify-center p-4">
-        <div class="bg-navy p-8 rounded-lg shadow-2xl border border-industrial-gray w-full max-w-md animate-in fade-in zoom-in duration-500 relative overflow-hidden">
+        <div class="bg-navy-premium p-8 w-full max-w-md animate-in fade-in zoom-in duration-500 relative overflow-hidden">
             <!-- Background Glow -->
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold to-transparent"></div>
             
@@ -47,14 +47,14 @@ export const renderLoginPage = () => {
                 </div>
 
                 <button type="submit" id="btn-login-submit"
-                    class="w-full bg-gold text-navy py-4 text-xs font-black uppercase tracking-[0.1em] shadow-[0_4px_0_#B8962F] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
+                    class="w-full btn-gold-premium py-4 text-xs font-black uppercase tracking-[0.1em] shadow-lg active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
                     <span>INICIAR SESIÓN</span>
-                    <span class="material-symbols-outlined text-sm">login</span>
+                    <span class="material-symbols-outlined text-sm font-black">login</span>
                 </button>
             </form>
             
             <div class="mt-6 text-center">
-                <p class="text-[9px] text-slate-500 uppercase tracking-widest">
+                <p class="text-[9px] text-slate-500 uppercase tracking-widest font-mono">
                     Protegido por Supabase Auth
                 </p>
             </div>
