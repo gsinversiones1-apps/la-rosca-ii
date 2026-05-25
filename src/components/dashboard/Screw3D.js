@@ -97,13 +97,29 @@ export function initScrew3D(containerId, skeletonId) {
             
             let phi = Math.atan2(z, x);
             
-            // 1. Límite del Hexágono
+            // 1. Límite del Hexágono (Con Fillet en las Aristas)
+            const r_fillet = 0.2; // Representa 2mm a escala OpenSCAD (donde radio=10)
             const pi6 = Math.PI / 6;
             const pi3 = Math.PI / 3;
+            
             let localPhi = (phi % pi3 + pi3) % pi3; 
             let angleToEdgeNormal = localPhi - pi6;
-            let apotema = radio * Math.cos(pi6);
-            let r_hex = apotema / Math.cos(angleToEdgeNormal);
+            let theta = Math.abs(angleToEdgeNormal);
+            
+            let apotema_sharp = radio * Math.cos(pi6);
+            let R_in = radio - r_fillet / Math.sin(pi3); // Radio interno para el offset
+            let theta_tangent = Math.atan2(R_in * Math.sin(pi6), apotema_sharp);
+            
+            let r_hex;
+            if (theta <= theta_tangent) {
+                // Segmento plano del hexágono
+                r_hex = apotema_sharp / Math.cos(theta);
+            } else {
+                // Curva de la arista (Fillet)
+                let gamma = pi6 - theta;
+                let discriminant = r_fillet * r_fillet - R_in * R_in * Math.sin(gamma) * Math.sin(gamma);
+                r_hex = R_in * Math.cos(gamma) + Math.sqrt(Math.max(0, discriminant));
+            }
             
             // 2. Límite del Cono (Bisel estilo OpenSCAD: h=10, d=20, cono_h=5 en y=8 d1=30 d2=0)
             let y_oscad = (y + altura / 2) * (10 / altura);
