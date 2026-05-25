@@ -7,8 +7,8 @@ export const renderSidebar = (storeName = "GLOBAL POS", userRole = 'vendedor') =
     const isAdmin = userRole === 'admin';
     
     const dashboardButton = isAdmin 
-        ? `<button id="nav-dashboard" class="w-full text-left text-slate-400 px-4 md:px-0 2xl:px-4 py-3 flex items-center justify-start md:justify-center 2xl:justify-start gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all" title="Dashboard">
-                <span class="material-symbols-outlined">dashboard</span> <span class="inline md:hidden 2xl:inline">Dashboard</span>
+        ? `<button id="nav-dashboard" class="w-full text-left text-slate-400 px-4 md:px-0 2xl:px-4 py-3 flex items-center justify-start md:justify-center 2xl:justify-start gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all" title="Panel Principal">
+                <span class="material-symbols-outlined">dashboard</span> <span class="inline md:hidden 2xl:inline">Panel Principal</span>
            </button>`
         : '';
 
@@ -41,8 +41,8 @@ export const renderSidebar = (storeName = "GLOBAL POS", userRole = 'vendedor') =
                 <span class="material-symbols-outlined">inventory_2</span> <span class="inline md:hidden 2xl:inline">Inventario</span>
             </button>
             
-            <button id="nav-pos" class="w-full text-left text-slate-400 px-4 md:px-0 2xl:px-4 py-3 flex items-center justify-start md:justify-center 2xl:justify-start gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all" title="Ventas (POS)">
-                <span class="material-symbols-outlined">point_of_sale</span> <span class="inline md:hidden 2xl:inline">Ventas (POS)</span>
+            <button id="nav-pos" class="w-full text-left text-slate-400 px-4 md:px-0 2xl:px-4 py-3 flex items-center justify-start md:justify-center 2xl:justify-start gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all" title="Punto de Venta">
+                <span class="material-symbols-outlined">point_of_sale</span> <span class="inline md:hidden 2xl:inline">Punto de Venta</span>
             </button>
             
             <button id="nav-clients" class="w-full text-left text-slate-400 px-4 md:px-0 2xl:px-4 py-3 flex items-center justify-start md:justify-center 2xl:justify-start gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all" title="Clientes">
