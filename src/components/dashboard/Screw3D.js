@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { FontLoader } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 
 /**
  * Inicializa y renderiza un tornillo 3D (Three.js) en un contenedor específico.
@@ -137,6 +139,53 @@ export function initScrew3D(containerId, skeletonId) {
     // Posición inicial
     tornillo.rotation.x = 0.2;
     scene.add(tornillo);
+
+    // 5. INSCRIPCIÓN EN ALTO RELIEVE (TEXTO 3D CIRCULAR)
+    const loader = new FontLoader();
+    loader.load('https://unpkg.com/three@0.128.0/examples/fonts/helvetiker_bold.typeface.json', function (font) {
+        const texto = 'TORNILLERIA LA ROSCA II  •  '; 
+        const radioTexto = 0.65; // Sobre la cara hexagonal
+        
+        const textoGroup = new THREE.Group();
+        
+        // Ubicación: Cara superior plana de la cabeza hexagonal
+        // vastago es 4.0, cabeza está en Y = 2.35 y mide 0.7 de alto. Borde superior = 2.35 + 0.35 = 2.7
+        textoGroup.position.y = (largoVastago / 2) + 0.7;
+        
+        const anguloPorLetra = (Math.PI * 2) / texto.length;
+
+        for (let i = 0; i < texto.length; i++) {
+            const char = texto[i];
+            if (char === ' ') continue;
+
+            const charGeo = new TextGeometry(char, {
+                font: font,
+                size: 0.12,
+                height: 0.05, // Efecto ALTO RELIEVE real
+                curveSegments: 3,
+                bevelEnabled: true,
+                bevelThickness: 0.01,
+                bevelSize: 0.005,
+            });
+
+            charGeo.computeBoundingBox();
+            charGeo.center();
+
+            const charMesh = new THREE.Mesh(charGeo, matPremium); // Mismo material
+            
+            const ang = i * anguloPorLetra;
+            
+            charMesh.position.x = Math.cos(ang) * radioTexto;
+            charMesh.position.z = Math.sin(ang) * radioTexto;
+            
+            charMesh.rotation.x = -Math.PI / 2;
+            charMesh.rotation.z = -ang - (Math.PI / 2); // Orientar la base de la letra hacia el centro
+
+            textoGroup.add(charMesh);
+        }
+        
+        tornillo.add(textoGroup);
+    });
 
     // --- OPTIMIZACIÓN DE RENDIMIENTO (ResizeObserver) ---
     const resizeObserver = new ResizeObserver(entries => {
