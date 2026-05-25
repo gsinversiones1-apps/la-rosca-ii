@@ -80,10 +80,56 @@ export function initScrew3D(containerId, skeletonId) {
     const cuerpo = new THREE.Mesh(cuerpoGeo, matPremium);
     tornillo.add(cuerpo);
 
-    // 2. CABEZA HEXAGONAL
-    const cabezaGeo = new THREE.CylinderGeometry(1.0, 1.0, 0.7, 6);
+    // --- FUNCIÓN GENERADORA DE CABEZA BISELADA (CSG Procedural) ---
+    function crearCabezaBiselada(radio, altura) {
+        const radialSegs = 180; // Alta resolución para el corte cónico curvo
+        const heightSegs = 20; 
+        const geo = new THREE.CylinderGeometry(radio, radio, altura, radialSegs, heightSegs);
+        const pos = geo.attributes.position;
+        
+        for (let i = 0; i < pos.count; i++) {
+            let x = pos.getX(i);
+            let y = pos.getY(i);
+            let z = pos.getZ(i);
+            
+            let r = Math.sqrt(x*x + z*z);
+            if (r < 0.0001) continue; 
+            
+            let phi = Math.atan2(z, x);
+            
+            // 1. Límite del Hexágono
+            const pi6 = Math.PI / 6;
+            const pi3 = Math.PI / 3;
+            let localPhi = (phi % pi3 + pi3) % pi3; 
+            let angleToEdgeNormal = localPhi - pi6;
+            let apotema = radio * Math.cos(pi6);
+            let r_hex = apotema / Math.cos(angleToEdgeNormal);
+            
+            // 2. Límite del Cono (Bisel estilo OpenSCAD: h=10, d=20, cono_h=5 en y=8 d1=30 d2=0)
+            let y_oscad = (y + altura / 2) * (10 / altura);
+            let r_cone_oscad = 15 - 3 * (y_oscad - 8);
+            if (y_oscad < 8) r_cone_oscad = Infinity;
+            let r_cone = r_cone_oscad * (radio / 10);
+            
+            // 3. Intersección Matemática
+            let r_max = Math.min(r_hex, r_cone);
+            
+            // Desplazamiento del vértice
+            let f = r / radio; 
+            let r_new = f * r_max;
+            
+            pos.setXYZ(i, r_new * Math.cos(phi), y, r_new * Math.sin(phi));
+        }
+        
+        geo.computeVertexNormals();
+        return geo;
+    }
+
+    // 2. CABEZA HEXAGONAL (CSG Intersección OpenSCAD)
+    const alturaCabeza = 1.0; // Proporción matemática 2:1 respecto al diámetro
+    const cabezaGeo = crearCabezaBiselada(1.0, alturaCabeza);
     const cabeza = new THREE.Mesh(cabezaGeo, matPremium);
-    cabeza.position.y = (largoVastago / 2) + 0.35;
+    cabeza.position.y = (largoVastago / 2) + (alturaCabeza / 2);
     tornillo.add(cabeza);
 
     // 3. GENERADOR DE ROSCA MÉTRICA 60°
@@ -147,8 +193,8 @@ export function initScrew3D(containerId, skeletonId) {
         const textoGroup = new THREE.Group();
         
         // Ubicación: Cara superior plana de la cabeza hexagonal
-        // vastago es 4.0, cabeza está en Y = 2.35 y mide 0.7 de alto. Borde superior = 2.35 + 0.35 = 2.7
-        textoGroup.position.y = (largoVastago / 2) + 0.7;
+        // vastago es 4.0, cabeza está en Y = 2.5 y mide 1.0 de alto. Borde superior = 2.5 + 0.5 = 3.0
+        textoGroup.position.y = (largoVastago / 2) + 1.0;
         
         const anguloPorLetra = (Math.PI * 2) / texto.length;
 
