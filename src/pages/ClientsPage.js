@@ -92,9 +92,33 @@ export const renderClientRow = (client) => {
     const direccion = client.direccion || '<span class="text-slate-600 font-normal">NO REGISTRADO</span>';
     const nombreCompleto = `${client.nombre} ${client.apellido || ''}`.trim();
     
+    // Normalizar y formatear documento de identidad
+    let displayCedula = client.cedula || '';
+    let raw = String(displayCedula).toUpperCase().trim();
+    if (/^\d+$/.test(raw)) raw = `V-${raw}`; // Asumir V- si solo son números
+    
+    const match = raw.match(/^([VEJG])-?(.*)$/);
+    if (match) {
+        const prefix = match[1];
+        const num = match[2].replace(/\D/g, '');
+        if (['V', 'E'].includes(prefix) && num) {
+            displayCedula = `${prefix}-${new Intl.NumberFormat('es-VE').format(num)}`;
+        } else if (['J', 'G'].includes(prefix) && num) {
+            if (num.length > 8) {
+                displayCedula = `${prefix}-${num.slice(0, 8)}-${num.slice(8, 9)}`;
+            } else {
+                displayCedula = `${prefix}-${num}`;
+            }
+        } else {
+            displayCedula = raw;
+        }
+    } else {
+        displayCedula = raw;
+    }
+    
     return `
     <tr class="hover:bg-white/5 transition-colors border-b border-industrial-gray">
-        <td class="p-4 font-mono text-gold uppercase text-sm">${client.cedula}</td>
+        <td class="p-4 font-mono text-gold uppercase text-sm whitespace-nowrap">${displayCedula}</td>
         <td class="p-4 uppercase text-white">${nombreCompleto}</td>
         <td class="p-4 uppercase font-mono">${telefono}</td>
         <td class="p-4 uppercase text-[10px] max-w-xs truncate" title="${direccion}">${direccion}</td>

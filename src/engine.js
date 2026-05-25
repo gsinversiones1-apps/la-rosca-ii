@@ -413,14 +413,17 @@ export function updateClientsKPIs() {
     totalEl.innerText = clients.length;
     
     const juridicos = clients.filter(c => {
-        const ced = c && c.cedula ? String(c.cedula).toUpperCase() : '';
-        return ced.startsWith('J-');
+        let ced = c && c.cedula ? String(c.cedula).toUpperCase().trim() : '';
+        if (/^\d+$/.test(ced)) ced = `V-${ced}`;
+        return ced.startsWith('J-') || ced.startsWith('J') || ced.startsWith('G-') || ced.startsWith('G');
     }).length;
     juridicosEl.innerText = juridicos;
     
     const naturales = clients.filter(c => {
-        const ced = c && c.cedula ? String(c.cedula).toUpperCase() : '';
-        return ced.startsWith('V-') || ced.startsWith('E-');
+        let ced = c && c.cedula ? String(c.cedula).toUpperCase().trim() : '';
+        if (/^\d+$/.test(ced)) ced = `V-${ced}`;
+        const isJ = ced.startsWith('J-') || ced.startsWith('J') || ced.startsWith('G-') || ced.startsWith('G');
+        return !isJ;
     }).length;
     naturalesEl.innerText = naturales;
 }
