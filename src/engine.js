@@ -481,12 +481,207 @@ async function loadDashboardData() {
                 `).join('');
             }
         }
+
+        // Inicializar Gráficos Avanzados
+        initAdvancedDashboardAnalytics(data);
+
     } catch (error) {
         console.error('Error cargando Dashboard:', error);
         document.getElementById('kpi-ventas').innerText = 'ERROR';
         document.getElementById('kpi-tickets').innerText = 'ERROR';
         document.getElementById('kpi-margen').innerText = 'ERROR';
     }
+}
+
+// Variables Globales para Gráficos para poder destruirlos al cambiar de vista o rango
+let pulsoVentasChartInstance = null;
+let topCategoriasChartInstance = null;
+
+function initAdvancedDashboardAnalytics(realData) {
+    // 1. Configuración de Datos Mock
+    const mockData = {
+        hoy: {
+            labels: ['08:00', '10:00', '12:00', '14:00', '16:00', '18:00'],
+            ventas: [120, 250, 480, 210, 390, 150], // Hoy
+            ventasAyer: [100, 200, 400, 190, 320, 100], // Ayer
+            categorias: { labels: ['Acero Inox', 'Grado 5', 'Automotriz', 'Tacos', 'Brocas'], data: [45, 30, 15, 7, 3] }
+        },
+        '7dias': {
+            labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
+            ventas: [800, 950, 1200, 1100, 1500, 1800, 500],
+            ventasAyer: [700, 900, 1050, 1000, 1300, 1600, 400], // Semana anterior
+            categorias: { labels: ['Acero Inox', 'Grado 5', 'Automotriz', 'Tacos', 'Brocas'], data: [350, 250, 120, 80, 50] }
+        },
+        mes: {
+            labels: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+            ventas: [4500, 5200, 4800, 6100],
+            ventasAyer: [4200, 4900, 4500, 5800], // Mes anterior
+            categorias: { labels: ['Acero Inox', 'Grado 5', 'Automotriz', 'Tacos', 'Brocas'], data: [1500, 1100, 600, 400, 200] }
+        }
+    };
+
+    // 2. Renderizar Widgets de Acciones Recomendadas
+    const accionesContainer = document.getElementById('acciones-recomendadas-container');
+    if (accionesContainer) {
+        let accionesHtml = '';
+        
+        if (realData && realData.alertas_reposicion) {
+            realData.alertas_reposicion.slice(0, 2).forEach(item => {
+                accionesHtml += `
+                    <div class="bg-navy-premium border border-red-900/30 p-4 rounded-xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-16 h-16 bg-red-500/10 rounded-bl-full"></div>
+                        <h5 class="text-[10px] text-red-500 font-bold uppercase tracking-widest mb-1">STOCK CRÍTICO</h5>
+                        <p class="text-white text-sm font-bold mb-3 truncate" title="${item.producto}">${item.producto}</p>
+                        <button class="w-full bg-red-900/40 hover:bg-red-700/60 border border-red-500/50 text-white text-xs py-1.5 rounded-lg transition-colors shadow-sm" onclick="alert('Generando orden de compra para ${item.producto}')">Generar orden de compra</button>
+                    </div>`;
+            });
+        }
+        
+        if (realData && realData.dinero_estancado) {
+            realData.dinero_estancado.slice(0, 1).forEach(item => {
+                accionesHtml += `
+                    <div class="bg-navy-premium border border-orange-900/30 p-4 rounded-xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-16 h-16 bg-orange-500/10 rounded-bl-full"></div>
+                        <h5 class="text-[10px] text-orange-400 font-bold uppercase tracking-widest mb-1">DINERO ESTANCADO</h5>
+                        <p class="text-white text-sm font-bold mb-3 truncate" title="${item.producto}">${item.producto}</p>
+                        <button class="w-full bg-orange-900/40 hover:bg-orange-700/60 border border-orange-500/50 text-white text-xs py-1.5 rounded-lg transition-colors shadow-sm" onclick="alert('Creando promoción para ${item.producto}')">Crear promoción 2x1</button>
+                    </div>`;
+            });
+        }
+
+        if (accionesHtml === '') {
+            accionesHtml = '<div class="col-span-full text-slate-500 text-xs font-bold uppercase tracking-wider text-center py-4">Sin alertas operativas. Todo bajo control.</div>';
+        }
+        accionesContainer.innerHTML = accionesHtml;
+    }
+
+    // 3. Funciones de Renderizado de Gráficos
+    const renderCharts = (period) => {
+        if (!window.Chart) {
+            console.error('Chart.js no está cargado');
+            return;
+        }
+
+        const dataObj = mockData[period];
+        if (!dataObj) return;
+
+        // Limpiar gráficos existentes
+        if (pulsoVentasChartInstance) pulsoVentasChartInstance.destroy();
+        if (topCategoriasChartInstance) topCategoriasChartInstance.destroy();
+
+        // Configuración común Chart.js
+        Chart.defaults.color = '#94a3b8'; // text-slate-400
+        Chart.defaults.font.family = "'Inter', sans-serif";
+
+        // Pulso de Ventas (Líneas)
+        const ctxPulso = document.getElementById('pulso-ventas-chart');
+        if (ctxPulso) {
+            pulsoVentasChartInstance = new Chart(ctxPulso, {
+                type: 'line',
+                data: {
+                    labels: dataObj.labels,
+                    datasets: [
+                        {
+                            label: 'Actual',
+                            data: dataObj.ventas,
+                            borderColor: '#D4AF37', // Gold
+                            backgroundColor: 'rgba(212, 175, 55, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#D4AF37',
+                            pointBorderColor: '#1B263B', // Navy
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Anterior',
+                            data: dataObj.ventasAyer,
+                            borderColor: '#64748b', // slate-500
+                            borderWidth: 2,
+                            borderDash: [5, 5], // Punteada
+                            pointRadius: 0,
+                            pointHoverRadius: 4,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', align: 'end', labels: { boxWidth: 12, font: { weight: 'bold' } } },
+                        tooltip: { mode: 'index', intersect: false, backgroundColor: 'rgba(15, 22, 38, 0.9)', titleColor: '#D4AF37', bodyColor: '#fff', borderColor: 'rgba(212,175,55,0.2)', borderWidth: 1 }
+                    },
+                    scales: {
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false }, beginAtZero: true }
+                    },
+                    interaction: { mode: 'nearest', axis: 'x', intersect: false }
+                }
+            });
+        }
+
+        // Top Categorías (Barras)
+        const ctxCat = document.getElementById('top-categorias-chart');
+        if (ctxCat) {
+            topCategoriasChartInstance = new Chart(ctxCat, {
+                type: 'bar',
+                data: {
+                    labels: dataObj.categorias.labels,
+                    datasets: [{
+                        label: 'Ventas',
+                        data: dataObj.categorias.data,
+                        backgroundColor: [
+                            'rgba(212, 175, 55, 0.8)', // Gold
+                            'rgba(212, 175, 55, 0.6)',
+                            'rgba(212, 175, 55, 0.4)',
+                            'rgba(212, 175, 55, 0.2)',
+                            'rgba(212, 175, 55, 0.1)'
+                        ],
+                        borderColor: '#D4AF37',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { backgroundColor: 'rgba(15, 22, 38, 0.9)', titleColor: '#fff', bodyColor: '#D4AF37', borderColor: 'rgba(212,175,55,0.2)', borderWidth: 1 }
+                    },
+                    scales: {
+                        x: { grid: { display: false, drawBorder: false } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)', drawBorder: false }, beginAtZero: true }
+                    }
+                }
+            });
+        }
+    };
+
+    // 4. Inicializar con 'hoy'
+    setTimeout(() => { renderCharts('hoy'); }, 100);
+
+    // 5. Configurar Listeners del Selector de Tiempo
+    const timeBtns = document.querySelectorAll('.time-selector-btn');
+    timeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            // Reset styles
+            timeBtns.forEach(b => {
+                b.classList.remove('active', 'bg-gold', 'text-black', 'shadow-[0_0_10px_rgba(212,175,55,0.3)]');
+                b.classList.add('text-slate-400');
+            });
+            // Apply active styles
+            e.target.classList.add('active', 'bg-gold', 'text-black', 'shadow-[0_0_10px_rgba(212,175,55,0.3)]');
+            e.target.classList.remove('text-slate-400');
+            
+            // Re-render charts
+            const period = e.target.getAttribute('data-period');
+            renderCharts(period);
+        });
+    });
 }
 
 function renderProductsInGrid(products = GlobalState.allProducts) {
