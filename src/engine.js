@@ -462,19 +462,18 @@ async function loadDashboardData() {
             }
         }
 
-        // Renderizar Dinero Estancado
         const insightEstancado = document.getElementById('insight-estancado');
         if (insightEstancado) {
             if (data.dinero_estancado.length === 0) {
                 insightEstancado.innerHTML = '<div class="text-green-500 text-sm font-bold flex items-center gap-2"><span class="material-symbols-outlined">check_circle</span> Flujo de ventas óptimo</div>';
             } else {
                 insightEstancado.innerHTML = data.dinero_estancado.map(item => `
-                    <div class="bg-black/30 p-3 rounded-sm border border-orange-900/30 flex justify-between items-center group hover:border-orange-500 transition-colors">
+                    <div class="bg-black/30 p-3 rounded-sm border border-red-900/30 flex justify-between items-center group hover:border-red-500 transition-colors">
                         <div>
                             <div class="text-white text-sm font-bold">${item.producto}</div>
-                            <div class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Stock Alto: <span class="text-orange-400 font-bold">${item.stock} uds</span></div>
+                            <div class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider">Stock Alto: <span class="text-red-500 font-bold">${item.stock} uds</span></div>
                         </div>
-                        <div class="text-orange-400 text-[10px] uppercase font-bold text-right">
+                        <div class="text-red-500 text-[10px] uppercase font-bold text-right">
                             0 ventas<br/>en 7 días
                         </div>
                     </div>
@@ -540,11 +539,11 @@ function initAdvancedDashboardAnalytics(realData) {
         if (realData && realData.dinero_estancado) {
             realData.dinero_estancado.slice(0, 1).forEach(item => {
                 accionesHtml += `
-                    <div class="bg-navy-premium border border-orange-900/30 p-4 rounded-xl relative overflow-hidden group">
-                        <div class="absolute right-0 top-0 w-16 h-16 bg-orange-500/10 rounded-bl-full"></div>
-                        <h5 class="text-[10px] text-orange-400 font-bold uppercase tracking-widest mb-1">DINERO ESTANCADO</h5>
+                    <div class="bg-navy-premium border border-red-900/30 p-4 rounded-xl relative overflow-hidden group">
+                        <div class="absolute right-0 top-0 w-16 h-16 bg-red-500/10 rounded-bl-full"></div>
+                        <h5 class="text-[10px] text-red-500 font-bold uppercase tracking-widest mb-1">DINERO ESTANCADO</h5>
                         <p class="text-white text-sm font-bold mb-3 truncate" title="${item.producto}">${item.producto}</p>
-                        <button class="w-full bg-orange-900/40 hover:bg-orange-700/60 border border-orange-500/50 text-white text-xs py-1.5 rounded-lg transition-colors shadow-sm" onclick="alert('Creando promoción para ${item.producto}')">Crear promoción 2x1</button>
+                        <button class="w-full bg-red-900/40 hover:bg-red-700/60 border border-red-500/50 text-white text-xs py-1.5 rounded-lg transition-colors shadow-sm" onclick="alert('Creando promoción para ${item.producto}')">Crear promoción 2x1</button>
                     </div>`;
             });
         }

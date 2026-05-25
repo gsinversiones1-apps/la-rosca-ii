@@ -30,23 +30,23 @@ export const renderDashboardPage = (userRole = 'vendedor') => {
             </div>
 
             <div class="bg-navy-premium border border-gold/10 p-6 rounded-[12px] relative overflow-hidden group hover:border-gold/30 hover-gold-glow transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
-                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-900/10 rounded-full blur-2xl group-hover:bg-blue-900/20 transition-all"></div>
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-yellow-900/10 rounded-full blur-2xl group-hover:bg-yellow-900/20 transition-all"></div>
                 <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-xs text-blue-400">receipt_long</span> TICKETS EMITIDOS
+                    <span class="material-symbols-outlined text-xs text-yellow-400">receipt_long</span> TICKETS EMITIDOS
                 </h3>
                 <div class="flex items-end gap-2 relative z-10">
-                    <span class="text-3xl font-black text-white font-headline" id="kpi-tickets"><span class="animate-pulse">...</span></span>
+                    <span class="text-3xl font-black text-yellow-400 font-headline" id="kpi-tickets"><span class="animate-pulse">...</span></span>
                 </div>
             </div>
 
             ${isAdmin ? `
             <div class="bg-navy-premium border border-gold/10 p-6 rounded-[12px] relative overflow-hidden group hover:border-gold/30 hover-gold-glow transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
-                <div class="absolute -right-4 -top-4 w-24 h-24 bg-gold/10 rounded-full blur-2xl group-hover:bg-gold/25 transition-all"></div>
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-green-900/10 rounded-full blur-2xl group-hover:bg-green-900/25 transition-all"></div>
                 <h3 class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-xs text-gold">percent</span> MARGEN ESTIMADO
+                    <span class="material-symbols-outlined text-xs text-green-400">percent</span> MARGEN ESTIMADO
                 </h3>
                 <div class="flex items-end gap-2 relative z-10">
-                    <span class="text-3xl font-black text-gold font-headline" id="kpi-margen">$<span class="animate-pulse">...</span></span>
+                    <span class="text-3xl font-black text-green-400 font-headline" id="kpi-margen">$<span class="animate-pulse">...</span></span>
                 </div>
             </div>
             ` : ''}
@@ -116,7 +116,7 @@ export const renderDashboardPage = (userRole = 'vendedor') => {
             ${isAdmin ? `
             <!-- Dinero Estancado -->
             <div class="bg-navy-premium border border-gold/10 p-6 rounded-[12px] relative overflow-hidden group hover:border-gold/30 hover-gold-glow transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.3)]">
-                <h4 class="text-xs font-bold text-orange-400 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-orange-900/20 pb-2">
+                <h4 class="text-xs font-bold text-red-500 uppercase tracking-widest mb-4 flex items-center gap-2 border-b border-red-900/20 pb-2">
                     <span class="material-symbols-outlined text-base animate-pulse">trending_down</span> DINERO ESTANCADO
                 </h4>
                 <div id="insight-estancado" class="space-y-3 max-h-64 overflow-y-auto custom-scrollbar pr-2">
