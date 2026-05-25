@@ -98,7 +98,7 @@ export function initScrew3D(containerId, skeletonId) {
             let phi = Math.atan2(z, x);
             
             // 1. Límite del Hexágono (Con Fillet en las Aristas)
-            const r_fillet = 0.2; // Representa 2mm a escala OpenSCAD (donde radio=10)
+            const r_fillet = 0.05; // Representa 0.50mm a escala OpenSCAD (donde radio=10)
             const pi6 = Math.PI / 6;
             const pi3 = Math.PI / 3;
             
