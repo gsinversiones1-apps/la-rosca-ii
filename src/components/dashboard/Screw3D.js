@@ -304,7 +304,7 @@ export function initScrew3D(containerId, skeletonId) {
         tornillo.rotation.y += 0.005; // Rotación suave
         
         // --- Lógica de la Tuerca Animada ---
-        nutTime += 0.015; // Velocidad del movimiento de la tuerca
+        nutTime += 0.005; // Velocidad del movimiento de la tuerca (reducida para ser más lenta)
         let nutY = Math.sin(nutTime) * 1.3; // Oscila entre -1.3 y 1.3
         tuerca.position.y = nutY;
         tuerca.rotation.y = (nutY / pasoRosca) * Math.PI * 2; // Rota en perfecta sincronía con los hilos
