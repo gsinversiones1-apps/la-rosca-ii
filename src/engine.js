@@ -1504,7 +1504,7 @@ Departamento de Compras
 La Rosca II
 Sistema Automatizado de Inventario
 `;
-        const mailtoLink = `mailto:${emailTo}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        const mailtoLink = `https://mail.google.com/mail/?view=cm&fs=1&to=${emailTo}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
         // Remover toast de info y mostrar toast de éxito
         const existingToasts = document.querySelectorAll('.fixed.top-4');
