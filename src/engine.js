@@ -1521,7 +1521,7 @@ Sistema Automatizado de Inventario
             </div>
         `;
 
-        window.showToast('success', '¡Orden Creadada!', `Orden registrada exitosamente (${cantidadAPedir} uds).`, acciones);
+        window.showToast('success', '¡Orden Creada!', `Orden registrada exitosamente (${cantidadAPedir} uds).`, acciones);
         
         // Auto-abrir opciones (descomentar si se desea que abran de una)
         // window.open(waLink, '_blank', 'noopener,noreferrer');
