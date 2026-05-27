@@ -63,3 +63,16 @@ export const insertProduct = async (productData) => {
     if (error) throw error;
     return data;
 };
+
+/**
+ * Inserta una nueva orden de compra en la base de datos
+ */
+export const insertPurchaseOrder = async (orderData) => {
+    const { data, error } = await supabase
+        .from('ordenes_compra')
+        .insert([orderData])
+        .select();
+
+    if (error) throw error;
+    return data;
+};

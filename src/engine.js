@@ -5,7 +5,7 @@
 
 import { GlobalState, updateState } from './context/State.js';
 import { fetchTasaBCV } from './api/bcv.js';
-import { getProductsByTenant, getSession, getUserProfile, signIn, signOut, insertProduct } from './api/supabaseClient.js';
+import { getProductsByTenant, getSession, getUserProfile, signIn, signOut, insertProduct, insertPurchaseOrder } from './api/supabaseClient.js';
 import { getClients, createClient } from './api/clients.js';
 import { saveSale } from './api/sales.js';
 import { getPendingSales, saveProductsLocal, getProductsLocal } from './utils/db.js';
@@ -572,7 +572,7 @@ function initAdvancedDashboardAnalytics(realData) {
                         <div class="absolute right-0 top-0 w-16 h-16 bg-red-500/10 rounded-bl-full"></div>
                         <h5 class="text-[10px] text-red-500 font-bold uppercase tracking-widest mb-1">STOCK CRÍTICO</h5>
                         <p class="text-white text-sm font-bold mb-3 truncate" title="${item.producto}">${item.producto}</p>
-                        <button class="w-full bg-red-900/40 hover:bg-red-700/60 border border-red-500/50 text-white text-xs py-1.5 rounded-lg transition-colors shadow-sm" onclick="alert('Generando orden de compra para ${item.producto}')">Generar orden de compra</button>
+                        <button class="w-full bg-red-900/40 hover:bg-red-700/60 border border-red-500/50 text-white text-xs py-1.5 rounded-lg transition-colors shadow-sm" onclick="window.generarOrdenCompra('${item.id || ''}', '${item.producto.replace(/'/g, \"\\\\'\")}', ${item.stock || 0}, ${item.stock_minimo || 50}, '${item.telefono_proveedor || ''}', '${item.email_proveedor || ''}')">Generar orden de compra</button>
                     </div>`;
             });
         }
@@ -1409,5 +1409,128 @@ function setupGlobalEvents() {
         }
     });
 }
+
+window.showToast = (type, title, message, actionHtml = '') => {
+    const banner = document.createElement('div');
+    const isError = type === 'error';
+    const isSuccess = type === 'success';
+    const isInfo = type === 'info';
+    
+    let borderColor = isError ? 'border-red-800' : isSuccess ? 'border-green-800' : 'border-gold/50';
+    let bgColor = isError ? 'bg-red-600' : isSuccess ? 'bg-green-600' : 'bg-navy-premium';
+    let icon = isError ? 'warning' : isSuccess ? 'check_circle' : 'info';
+    let shadow = isError ? 'shadow-[0_0_20px_rgba(220,38,38,0.5)]' : isSuccess ? 'shadow-[0_0_20px_rgba(22,163,74,0.5)]' : 'shadow-[0_0_20px_rgba(212,175,55,0.3)]';
+
+    banner.className = `fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] ${bgColor} border-2 ${borderColor} text-white px-6 py-4 ${shadow} font-headline font-bold flex flex-col items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300 min-w-[300px] rounded-lg`;
+    
+    banner.innerHTML = `
+        <div class="flex items-center gap-3 w-full">
+            <span class="material-symbols-outlined text-3xl">${icon}</span>
+            <div class="flex-1">
+                <h3 class="uppercase tracking-widest text-sm">${title}</h3>
+                <p class="text-xs font-normal opacity-90">${message}</p>
+            </div>
+            <button onclick="this.parentElement.parentElement.remove()" class="text-white hover:text-gray-300">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        ${actionHtml ? `<div class="w-full mt-2">${actionHtml}</div>` : ''}
+    `;
+    document.body.appendChild(banner);
+    
+    // Auto remove if no action needed or if it's info/error
+    if (!actionHtml) {
+        setTimeout(() => {
+            if(document.body.contains(banner)) {
+                banner.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => banner.remove(), 300);
+            }
+        }, 5000);
+    }
+};
+
+window.generarOrdenCompra = async (productoId, productoNombre, stockActual, stockMinimo, telefonoProveedor, emailProveedor) => {
+    try {
+        const cantidadAPedir = Math.max(50, stockMinimo - stockActual + 20); // Lógica base
+        
+        window.showToast('info', 'Procesando...', 'Generando orden de compra en el sistema.');
+
+        // Guardar en Supabase
+        await insertPurchaseOrder({
+            producto_id: productoId ? parseInt(productoId) : null,
+            descripcion_producto: productoNombre,
+            cantidad_a_pedir: cantidadAPedir,
+            estado: 'Pendiente'
+        });
+
+        // Construir mensaje WA
+        let telefono = telefonoProveedor ? telefonoProveedor.replace(/\\D/g,'') : '';
+        if (telefono && !telefono.startsWith('58')) telefono = '58' + telefono; // Default VE code si no tiene
+        
+        const mensajeTexto = \`*¡Hola!*
+El sistema inteligente de inventario de *La Rosca II* alerta de un stock crítico.
+
+📦 *Producto:* \${productoNombre}
+📉 *Stock Actual:* \${stockActual} uds.
+🛒 *Cantidad Solicitada:* \${cantidadAPedir} uds.
+
+Por favor, confirmar disponibilidad y tiempo de entrega.
+_Mensaje generado automáticamente._\`;
+
+        const waLink = telefono 
+            ? \`https://wa.me/\${telefono}?text=\${encodeURIComponent(mensajeTexto)}\`
+            : \`https://wa.me/?text=\${encodeURIComponent(mensajeTexto)}\`;
+
+        // Construir Email
+        const emailTo = emailProveedor || '';
+        const emailSubject = \`Orden de Compra Urgente - La Rosca II - \${productoNombre}\`;
+        const emailBody = \`Estimado Proveedor,
+
+Por medio de la presente, emitimos formalmente una Orden de Compra debido a niveles críticos de stock en nuestro inventario.
+
+DETALLES DE LA ORDEN:
+------------------------------------------
+Producto: \${productoNombre}
+Stock Actual Registrado: \${stockActual} unidades
+Cantidad Requerida a Despachar: \${cantidadAPedir} unidades
+------------------------------------------
+
+Agradecemos nos confirme la recepción de esta orden, disponibilidad de la mercancía, y tiempo estimado de entrega junto a su respectiva cotización formal para procesar el pago.
+
+Quedamos a su entera disposición,
+
+Atentamente,
+Departamento de Compras
+La Rosca II
+Sistema Automatizado de Inventario
+\`;
+        const mailtoLink = \`mailto:\${emailTo}?subject=\${encodeURIComponent(emailSubject)}&body=\${encodeURIComponent(emailBody)}\`;
+
+        // Remover toast de info y mostrar toast de éxito
+        const existingToasts = document.querySelectorAll('.fixed.top-4');
+        existingToasts.forEach(t => t.remove());
+
+        const acciones = \`
+            <div class="flex gap-2">
+                <a href="\${waLink}" target="_blank" rel="noopener noreferrer" class="flex-1 bg-green-500 hover:bg-green-400 text-white text-center py-2 rounded font-bold text-xs flex items-center justify-center gap-1 transition-colors">
+                    <span class="material-symbols-outlined text-sm">chat</span> Enviar WA
+                </a>
+                <a href="\${mailtoLink}" target="_blank" rel="noopener noreferrer" class="flex-1 bg-blue-500 hover:bg-blue-400 text-white text-center py-2 rounded font-bold text-xs flex items-center justify-center gap-1 transition-colors">
+                    <span class="material-symbols-outlined text-sm">mail</span> Enviar Correo
+                </a>
+            </div>
+        \`;
+
+        window.showToast('success', '¡Orden Creadada!', \`Orden registrada exitosamente (\${cantidadAPedir} uds).\`, acciones);
+        
+        // Auto-abrir opciones (descomentar si se desea que abran de una)
+        // window.open(waLink, '_blank', 'noopener,noreferrer');
+        // if(emailTo) window.open(mailtoLink, '_blank', 'noopener,noreferrer');
+
+    } catch (err) {
+        console.error("Error al generar orden:", err);
+        window.showToast('error', 'Error del Sistema', 'No se pudo crear la orden de compra en la base de datos.');
+    }
+};
 
 document.addEventListener('DOMContentLoaded', initApp);
