@@ -1468,14 +1468,12 @@ window.generarOrdenCompra = async (productoId, productoNombre, stockActual, stoc
         if (telefono && !telefono.startsWith('58')) telefono = '58' + telefono; // Default VE code si no tiene
         
         const mensajeTexto = `*¡Hola!*
-El sistema inteligente de inventario de *La Rosca II* alerta de un stock crítico.
+Te escribimos del sistema automatizado de *La Rosca II*.
 
-📦 *Producto:* ${productoNombre}
-📉 *Stock Actual:* ${stockActual} uds.
-🛒 *Cantidad Solicitada:* ${cantidadAPedir} uds.
+Acabamos de enviarte un correo electrónico con una nueva Orden de Compra formal para el producto *${productoNombre}*.
 
-Por favor, confirmar disponibilidad y tiempo de entrega.
-_Mensaje generado automáticamente._`;
+Por favor, revisa tu bandeja de entrada para verificar las cantidades requeridas y respóndenos confirmando la disponibilidad del stock. ¡Gracias!
+_Aviso generado automáticamente._`;
 
         const waLink = telefono 
             ? `https://wa.me/${telefono}?text=${encodeURIComponent(mensajeTexto)}`
