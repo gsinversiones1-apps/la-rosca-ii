@@ -1467,13 +1467,12 @@ window.generarOrdenCompra = async (productoId, productoNombre, stockActual, stoc
         let telefono = telefonoProveedor ? telefonoProveedor.replace(/D/g,'') : '';
         if (telefono && !telefono.startsWith('58')) telefono = '58' + telefono; // Default VE code si no tiene
         
-        const mensajeTexto = `*¡Hola!*
-Te escribimos del sistema automatizado de *La Rosca II*.
+        const mensajeTexto = `*¡Hola, un gusto saludarte!* 👋
+Te escribimos de parte del equipo de compras de *La Rosca II*.
 
-Acabamos de enviarte un correo electrónico con una nueva Orden de Compra formal para el producto *${productoNombre}*.
+Te acabamos de enviar un correo electrónico con una nueva Orden de Compra para el producto *${productoNombre}*.
 
-Por favor, revisa tu bandeja de entrada para verificar las cantidades requeridas y respóndenos confirmando la disponibilidad del stock. ¡Gracias!
-_Aviso generado automáticamente._`;
+Cuando tengas un chance, por favor revisa tu bandeja de entrada para ver los detalles de las cantidades que necesitamos, y avísanos por esta vía si cuentan con disponibilidad. ¡Quedamos súper atentos, muchas gracias!`;
 
         const waLink = telefono 
             ? `https://wa.me/${telefono}?text=${encodeURIComponent(mensajeTexto)}`
