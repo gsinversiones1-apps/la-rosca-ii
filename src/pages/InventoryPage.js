@@ -57,13 +57,10 @@ export const renderInventoryPage = (userRole) => {
                     </div>
                     <div class="col-span-2 sm:col-span-1">
                         <label class="block text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Categoría</label>
-                        <select id="add-prod-area" required class="w-full bg-black/50 border border-industrial-gray rounded px-3 py-2 text-xs text-white focus:border-gold outline-none uppercase">
-                            <option value="Ferreteria">Ferretería</option>
-                            <option value="Allen">Allen</option>
-                            <option value="Drywall">Drywall</option>
-                            <option value="Automotriz">Automotriz</option>
-                            <option value="General">General</option>
-                        </select>
+                        <input type="text" id="add-prod-area" list="tenant-categories" required class="w-full bg-black/50 border border-industrial-gray rounded px-3 py-2 text-xs text-white focus:border-gold outline-none uppercase" placeholder="EJ: VIVERES, FERRETERIA, COSMETICOS">
+                        <datalist id="tenant-categories">
+                            <!-- Las categorías previas de este tenant se cargarán dinámicamente aquí -->
+                        </datalist>
                     </div>
                     <div class="col-span-2">
                         <label class="block text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Nombre del Producto</label>

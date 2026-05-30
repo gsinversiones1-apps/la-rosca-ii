@@ -392,6 +392,13 @@ export function navigate(page) {
     } else if (page === 'inventory') {
         contentArea.innerHTML = renderInventoryPage(GlobalState.userRole);
         applyFilters();
+        
+        // Población dinámica de categorías en el datalist
+        const datalist = document.getElementById('tenant-categories');
+        if (datalist && GlobalState.allProducts) {
+            const uniqueCategories = [...new Set(GlobalState.allProducts.map(p => p.category).filter(Boolean))];
+            datalist.innerHTML = uniqueCategories.map(cat => `<option value="${cat}">`).join('');
+        }
     } else if (page === 'dashboard') {
         contentArea.innerHTML = renderDashboardPage(GlobalState.userRole);
         loadDashboardData();
