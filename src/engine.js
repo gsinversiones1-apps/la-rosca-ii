@@ -1324,8 +1324,7 @@ function setupGlobalEvents() {
                 area: document.getElementById('add-prod-area').value.toUpperCase(),
                 medida: 'N/A', // O podríamos agregarlo al form
                 precio_usd: parseFloat(document.getElementById('add-prod-precio').value),
-                stock: parseInt(document.getElementById('add-prod-stock').value, 10),
-                image_url: document.getElementById('add-prod-image').value || null
+                stock: parseInt(document.getElementById('add-prod-stock').value, 10)
             };
 
             try {
