@@ -5,7 +5,7 @@
 
 import { GlobalState, updateState } from './context/State.js';
 import { fetchTasaBCV } from './api/bcv.js';
-import { getProductsByTenant, getSession, getUserProfile, signIn, signOut, insertProduct, insertPurchaseOrder } from './api/supabaseClient.js';
+import { getProductsByTenant, getSession, getUserProfile, signIn, signOut, insertProduct, updateProduct, insertPurchaseOrder } from './api/supabaseClient.js';
 import { getClients, createClient } from './api/clients.js';
 import { saveSale } from './api/sales.js';
 import { getPendingSales, saveProductsLocal, getProductsLocal } from './utils/db.js';
@@ -916,6 +916,9 @@ async function handleCheckout(isConsumidorFinal = false) {
 }
 
 let eventsSetup = false;
+let isEditing = false;
+let currentProductId = null;
+
 function setupGlobalEvents() {
     if (eventsSetup) return;
     eventsSetup = true;
@@ -1022,10 +1025,50 @@ function setupGlobalEvents() {
 
         // Modal de Nuevo Producto (Inventario)
         if (e.target.closest('#btn-add-product')) {
+            isEditing = false;
+            currentProductId = null;
+            const form = document.getElementById('form-add-product');
+            if (form) form.reset();
+            const title = document.getElementById('modal-product-title');
+            if (title) title.textContent = 'Registrar Nuevo Producto';
+            const btnSave = document.getElementById('btn-save-product');
+            if (btnSave) btnSave.innerHTML = 'Guardar Producto <span class="material-symbols-outlined text-sm">save</span>';
+            
             const modal = document.getElementById('modal-add-product');
             if (modal) {
                 modal.classList.remove('opacity-0', 'pointer-events-none');
                 document.getElementById('modal-add-product-content').classList.remove('scale-95');
+            }
+        }
+        if (e.target.closest('.edit-product')) {
+            const editBtn = e.target.closest('.edit-product');
+            const productId = editBtn.dataset.id;
+            const product = GlobalState.allProducts.find(p => p.id == productId);
+            
+            if (product) {
+                isEditing = true;
+                currentProductId = productId;
+                
+                const form = document.getElementById('form-add-product');
+                if (form) form.reset();
+                
+                document.getElementById('add-prod-sku').value = product.codigo_skv || '';
+                document.getElementById('add-prod-area').value = product.area || 'General';
+                document.getElementById('add-prod-nombre').value = product.nombre || '';
+                document.getElementById('add-prod-precio').value = product.precio_usd || 0;
+                document.getElementById('add-prod-stock').value = product.stock || 0;
+                document.getElementById('add-prod-image').value = product.image_url || '';
+                
+                const title = document.getElementById('modal-product-title');
+                if (title) title.textContent = 'Editar Producto';
+                const btnSave = document.getElementById('btn-save-product');
+                if (btnSave) btnSave.innerHTML = 'Actualizar Cambios <span class="material-symbols-outlined text-sm">save</span>';
+                
+                const modal = document.getElementById('modal-add-product');
+                if (modal) {
+                    modal.classList.remove('opacity-0', 'pointer-events-none');
+                    document.getElementById('modal-add-product-content').classList.remove('scale-95');
+                }
             }
         }
         if (e.target.closest('#btn-close-modal-product') || e.target.closest('#btn-cancel-product')) {
@@ -1033,6 +1076,17 @@ function setupGlobalEvents() {
             if (modal) {
                 modal.classList.add('opacity-0', 'pointer-events-none');
                 document.getElementById('modal-add-product-content').classList.add('scale-95');
+                
+                setTimeout(() => {
+                    isEditing = false;
+                    currentProductId = null;
+                    const form = document.getElementById('form-add-product');
+                    if (form) form.reset();
+                    const title = document.getElementById('modal-product-title');
+                    if (title) title.textContent = 'Registrar Nuevo Producto';
+                    const btnSave = document.getElementById('btn-save-product');
+                    if (btnSave) btnSave.innerHTML = 'Guardar Producto <span class="material-symbols-outlined text-sm">save</span>';
+                }, 300);
             }
         }
 
@@ -1264,7 +1318,7 @@ function setupGlobalEvents() {
             saveBtn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Guardando...';
             saveBtn.disabled = true;
 
-            const newProduct = {
+            const productPayload = {
                 codigo_skv: document.getElementById('add-prod-sku').value.toUpperCase(),
                 nombre: document.getElementById('add-prod-nombre').value.toUpperCase(),
                 area: document.getElementById('add-prod-area').value.toUpperCase(),
@@ -1275,8 +1329,13 @@ function setupGlobalEvents() {
             };
 
             try {
-                await insertProduct(newProduct);
-                alert("Producto agregado exitosamente.");
+                if (isEditing && currentProductId) {
+                    await updateProduct(currentProductId, productPayload);
+                    alert("Producto actualizado exitosamente.");
+                } else {
+                    await insertProduct(productPayload);
+                    alert("Producto agregado exitosamente.");
+                }
                 // Limpiar form y cerrar
                 e.target.reset();
                 document.getElementById('modal-add-product').classList.add('opacity-0', 'pointer-events-none');
@@ -1285,9 +1344,9 @@ function setupGlobalEvents() {
                 location.reload(); 
             } catch (err) {
                 console.error(err);
-                alert("Error al agregar producto: " + err.message);
+                alert("Error al guardar producto: " + err.message);
             } finally {
-                saveBtn.innerHTML = 'Guardar Producto <span class="material-symbols-outlined text-sm">save</span>';
+                saveBtn.innerHTML = isEditing ? 'Actualizar Cambios <span class="material-symbols-outlined text-sm">save</span>' : 'Guardar Producto <span class="material-symbols-outlined text-sm">save</span>';
                 saveBtn.disabled = false;
             }
         }

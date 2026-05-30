@@ -65,6 +65,20 @@ export const insertProduct = async (productData) => {
 };
 
 /**
+ * Actualiza un producto existente en la base de datos
+ */
+export const updateProduct = async (productId, productData) => {
+    const { data, error } = await supabase
+        .from('productos')
+        .update(productData)
+        .eq('id', productId)
+        .select();
+
+    if (error) throw error;
+    return data;
+};
+
+/**
  * Inserta una nueva orden de compra en la base de datos
  */
 export const insertPurchaseOrder = async (orderData) => {

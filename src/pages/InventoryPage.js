@@ -43,7 +43,7 @@ export const renderInventoryPage = (userRole) => {
     <div id="modal-add-product" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 opacity-0 pointer-events-none transition-opacity duration-300">
         <div class="bg-navy border border-gold/30 rounded-xl w-full max-w-xl shadow-2xl overflow-hidden transform scale-95 transition-transform duration-300" id="modal-add-product-content">
             <div class="p-4 border-b border-industrial-gray flex justify-between items-center bg-dark-gray/50">
-                <h3 class="text-gold font-headline text-sm uppercase tracking-widest font-black">Registrar Nuevo Producto</h3>
+                <h3 id="modal-product-title" class="text-gold font-headline text-sm uppercase tracking-widest font-black">Registrar Nuevo Producto</h3>
                 <button id="btn-close-modal-product" class="text-slate-400 hover:text-white transition-colors">
                     <span class="material-symbols-outlined">close</span>
                 </button>
