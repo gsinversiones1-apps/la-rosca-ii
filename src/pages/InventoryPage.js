@@ -58,9 +58,9 @@ export const renderInventoryPage = (userRole) => {
                     <div class="col-span-2 sm:col-span-1">
                         <label class="block text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Categoría</label>
                         <select id="add-prod-area" required class="w-full bg-black/50 border border-industrial-gray rounded px-3 py-2 text-xs text-white focus:border-gold outline-none uppercase">
-                            <option value="Ferretería">Ferretería</option>
-                            <option value="Tornillería">Tornillería</option>
-                            <option value="Construcción">Construcción</option>
+                            <option value="Ferreteria">Ferretería</option>
+                            <option value="Allen">Allen</option>
+                            <option value="Drywall">Drywall</option>
                             <option value="Automotriz">Automotriz</option>
                             <option value="General">General</option>
                         </select>

@@ -1321,7 +1321,7 @@ function setupGlobalEvents() {
             const productPayload = {
                 codigo_skv: document.getElementById('add-prod-sku').value.toUpperCase(),
                 nombre: document.getElementById('add-prod-nombre').value.toUpperCase(),
-                area: document.getElementById('add-prod-area').value.toUpperCase(),
+                area: document.getElementById('add-prod-area').value,
                 medida: 'N/A', // O podríamos agregarlo al form
                 precio_usd: parseFloat(document.getElementById('add-prod-precio').value),
                 stock: parseInt(document.getElementById('add-prod-stock').value, 10)
