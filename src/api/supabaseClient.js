@@ -43,7 +43,7 @@ export const getProductsByTenant = async (tenantId) => {
     const { data, error } = await supabase
         .from('productos')
         .select('*')
-        .order('nombre', { ascending: true });
+        .order('name', { ascending: true });
     
     if (error) throw error;
     return data;

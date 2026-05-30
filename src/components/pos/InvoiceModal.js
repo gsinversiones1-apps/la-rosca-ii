@@ -4,7 +4,7 @@
 import { formatCurrency, formatDateTime } from '../../utils/formatters.js';
 
 export const renderInvoiceModal = (sale, client, items, config, tasa) => {
-    const subtotal = items.reduce((acc, i) => acc + (i.precio_usd * i.cantidad), 0);
+    const subtotal = items.reduce((acc, i) => acc + (i.base_price * i.cantidad), 0);
     const iva = subtotal * (config.iva / 100);
     const totalUsd = subtotal + iva;
     const totalBs = totalUsd * tasa;
@@ -28,9 +28,9 @@ export const renderInvoiceModal = (sale, client, items, config, tasa) => {
 
                 <div class="mb-4 border-t border-b border-dashed border-slate-200 py-2" style="color:#0B1929;">
                     <p class="font-bold border-b border-slate-100 mb-1 pb-1">CLIENTE:</p>
-                    <p class="uppercase font-black">${client ? (client.nombre + ' ' + (client.apellido||'')) : 'CONSUMIDOR FINAL'}</p>
-                    <p>C.I./RIF: ${client ? client.cedula : 'V-00000000-0'}</p>
-                    ${client?.direccion ? `<p class="text-[8px] italic">${client.direccion}</p>` : ''}
+                    <p class="uppercase font-black">${client ? (client.first_name + ' ' + (client.last_name||'')) : 'CONSUMIDOR FINAL'}</p>
+                    <p>C.I./RIF: ${client ? client.tax_id : 'V-00000000-0'}</p>
+                    ${client?.address ? `<p class="text-[8px] italic">${client.address}</p>` : ''}
                 </div>
 
                 <table class="w-full mb-4" style="color:#0B1929;">
@@ -45,8 +45,8 @@ export const renderInvoiceModal = (sale, client, items, config, tasa) => {
                         ${items.map(item => `
                             <tr>
                                 <td class="py-1">${item.cantidad}</td>
-                                <td class="py-1 uppercase">${item.nombre.substring(0, 20)}...</td>
-                                <td class="py-1 text-right">$${formatCurrency(item.precio_usd * item.cantidad)}</td>
+                                <td class="py-1 uppercase">${item.name.substring(0, 20)}...</td>
+                                <td class="py-1 text-right">$${formatCurrency(item.base_price * item.cantidad)}</td>
                             </tr>
                         `).join('')}
                     </tbody>

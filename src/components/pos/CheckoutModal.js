@@ -98,22 +98,22 @@ export const renderCheckoutModal = (totals) => {
                         <span class="material-symbols-outlined text-xs">person_add</span> Registrar Nuevo Cliente
                     </p>
                     <div class="grid grid-cols-2 gap-2">
-                        <input name="nombre" required type="text" placeholder="NOMBRE"
+                        <input name="first_name" required type="text" placeholder="NOMBRE"
                                style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
                                class="w-full text-xs p-2.5 outline-none uppercase font-bold"/>
-                        <input name="apellido" type="text" placeholder="APELLIDO (OPCIONAL)"
+                        <input name="last_name" type="text" placeholder="APELLIDO (OPCIONAL)"
                                style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
                                class="w-full text-xs p-2.5 outline-none uppercase font-bold"/>
                     </div>
                     <div class="flex gap-2">
                         <div class="w-1/2 flex flex-col gap-1">
-                            <input name="rif" id="checkout-new-rif" required type="text" placeholder="CÉDULA / RIF (V-XXXXXXX)"
+                            <input name="tax_id" id="checkout-new-rif" required type="text" placeholder="CÉDULA / RIF (V-XXXXXXX)"
                                    style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
                                    class="w-full text-xs p-2.5 outline-none uppercase font-bold"/>
                             <span id="checkout-rif-error" class="text-[8px] text-slate-500 font-bold">V-XXXXXXXX o J-XXXXXXXX-X</span>
                         </div>
                         <div class="w-1/2">
-                            <input name="telefono" id="checkout-new-telefono" type="text" placeholder="TELÉFONO (04XX-XXXXXXX)"
+                            <input name="phone_number" id="checkout-new-telefono" type="text" placeholder="TELÉFONO (04XX-XXXXXXX)"
                                    style="background:#0B1929; color:#D4A817; border:1px solid #2a3a4a;"
                                    class="w-full text-xs p-2.5 outline-none uppercase font-bold"/>
                         </div>

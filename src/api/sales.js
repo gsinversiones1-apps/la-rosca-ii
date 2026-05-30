@@ -11,7 +11,7 @@ export const saveSale = async (saleData) => {
 
     // La venta se guarda como N filas, una por producto en el carrito
     const rows = saleData.items.map(item => {
-        const itemSubtotal = item.precio_usd * item.cantidad;
+        const itemSubtotal = item.base_price * item.cantidad;
         const itemIva = itemSubtotal * (GlobalState.config.iva / 100);
         let itemIgtf = 0;
         
@@ -20,11 +20,11 @@ export const saveSale = async (saleData) => {
         }
 
         return {
-            producto_id: item.id,
-            cantidad: item.cantidad,
-            tasa_dia: GlobalState.tasaActual,
-            total_bs: (itemSubtotal + itemIva + itemIgtf) * GlobalState.tasaActual,
-            fecha_venta: new Date().toISOString(),
+            product_id: item.id,
+            quantity: item.cantidad,
+            exchange_rate: GlobalState.tasaActual,
+            total_local_currency: (itemSubtotal + itemIva + itemIgtf) * GlobalState.tasaActual,
+            created_at: new Date().toISOString(),
             cliente_id: saleData.clientId,
             metodo_pago: saleData.metodoPago,
             iva_amount: itemIva,
@@ -91,7 +91,7 @@ export const saveSale = async (saleData) => {
     saleData.items.forEach(saleItem => {
         const productIndex = GlobalState.allProducts.findIndex(p => p.id === saleItem.id);
         if (productIndex !== -1) {
-            GlobalState.allProducts[productIndex].stock -= saleItem.cantidad;
+            GlobalState.allProducts[productIndex].stock_quantity -= saleItem.cantidad;
             stockChanged = true;
         }
     });

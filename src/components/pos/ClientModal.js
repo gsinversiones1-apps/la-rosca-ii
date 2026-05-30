@@ -10,18 +10,18 @@ export const renderClientModal = (client = null) => {
     
     const clientData = client || {
         id: '',
-        nombre: '',
-        apellido: '',
-        cedula: '',
-        telefono: '',
-        direccion: ''
+        first_name: '',
+        last_name: '',
+        tax_id: '',
+        phone_number: '',
+        address: ''
     };
 
     // Determinar prefijo y número
     let docPrefix = 'V';
     let docNumber = '';
-    if (clientData.cedula) {
-        const match = clientData.cedula.match(/^([VEJGvejg])-?(.*)$/);
+    if (clientData.tax_id) {
+        const match = clientData.tax_id.match(/^([VEJGvejg])-?(.*)$/);
         if (match) {
             docPrefix = match[1].toUpperCase();
             docNumber = match[2].replace(/\D/g, '');
@@ -69,7 +69,7 @@ export const renderClientModal = (client = null) => {
                             placeholder="Ej: 12.345.678"/>
                     </div>
                     <span id="rif-validation-msg" class="text-[9px] mt-1.5 block font-bold text-slate-500">Solo números. Separadores automáticos.</span>
-                    <input type="hidden" name="rif" id="client-modal-rif-hidden" value="${clientData.cedula}" />
+                    <input type="hidden" name="rif" id="client-modal-rif-hidden" value="${clientData.tax_id}" />
                 </div>
 
                 <!-- Campos de Nombre Dinámicos -->
@@ -78,12 +78,12 @@ export const renderClientModal = (client = null) => {
                         <label id="label-nombre" class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-widest">
                             ${isJuridico ? 'Razón Social' : 'Nombres'}
                         </label>
-                        <input name="nombre" id="client-modal-nombre" required type="text" value="${clientData.nombre}" autocomplete="off"
+                        <input name="nombre" id="client-modal-nombre" required type="text" value="${clientData.first_name}" autocomplete="off"
                             class="w-full bg-dark-gray border border-industrial-gray text-white text-xs p-3 focus:border-gold outline-none uppercase font-bold rounded transition-colors"/>
                     </div>
                     <div id="field-apellido" class="${isJuridico ? 'hidden' : ''}">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-widest">Apellidos</label>
-                        <input name="apellido" id="client-modal-apellido" type="text" value="${clientData.apellido || ''}" autocomplete="off"
+                        <input name="apellido" id="client-modal-apellido" type="text" value="${clientData.last_name || ''}" autocomplete="off"
                             class="w-full bg-dark-gray border border-industrial-gray text-white text-xs p-3 focus:border-gold outline-none uppercase font-bold rounded transition-colors" placeholder="(OPCIONAL)"/>
                     </div>
                 </div>
@@ -91,14 +91,14 @@ export const renderClientModal = (client = null) => {
                 <!-- Teléfono y Dirección -->
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-widest">Teléfono</label>
-                    <input name="telefono" id="client-modal-telefono" type="text" value="${clientData.telefono || ''}" autocomplete="off"
+                    <input name="telefono" id="client-modal-telefono" type="text" value="${clientData.phone_number || ''}" autocomplete="off"
                         class="w-full bg-dark-gray border border-industrial-gray text-white text-xs p-3 focus:border-gold outline-none uppercase font-bold rounded transition-colors" 
                         placeholder="Ej: 0414-1234567"/>
                 </div>
                 
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1.5 tracking-widest">Dirección Fiscal</label>
-                    <textarea name="direccion" id="client-modal-direccion" class="w-full bg-dark-gray border border-industrial-gray text-white text-xs p-3 focus:border-gold outline-none uppercase font-bold rounded h-20 resize-none transition-colors">${clientData.direccion || ''}</textarea>
+                    <textarea name="direccion" id="client-modal-direccion" class="w-full bg-dark-gray border border-industrial-gray text-white text-xs p-3 focus:border-gold outline-none uppercase font-bold rounded h-20 resize-none transition-colors">${clientData.address || ''}</textarea>
                 </div>
                 
                 <div class="pt-2 flex gap-3">

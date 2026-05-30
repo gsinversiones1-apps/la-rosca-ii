@@ -7,7 +7,7 @@ export const getClients = async () => {
     const { data, error } = await supabase
         .from('clientes')
         .select('*')
-        .order('nombre', { ascending: true });
+        .order('first_name', { ascending: true });
     
     if (error) throw error;
     return data;
@@ -15,11 +15,11 @@ export const getClients = async () => {
 
 export const createClient = async (clientData) => {
     const payload = {
-        nombre: clientData.nombre || '',
-        apellido: clientData.apellido || '',
-        cedula: clientData.rif || clientData.cedula || '',
-        direccion: clientData.direccion || null,
-        telefono: clientData.telefono || null
+        first_name: clientData.nombre || '',
+        last_name: clientData.apellido || '',
+        tax_id: clientData.rif || clientData.cedula || '',
+        address: clientData.direccion || null,
+        phone_number: clientData.telefono || null
     };
     if (clientData.id) {
         payload.id = clientData.id;
@@ -28,19 +28,19 @@ export const createClient = async (clientData) => {
     // Intentamos guardar con el campo 'telefono'
     const { data, error } = await supabase
         .from('clientes')
-        .upsert([payload], { onConflict: 'cedula' })
+        .upsert([payload], { onConflict: 'tax_id' })
         .select();
     
     if (error) {
         // Fallback: si el campo 'telefono' no existe en la base de datos, reintentamos sin él
-        if (error.message.includes('telefono') || error.code === '42703') {
-            console.warn('[createClient] La columna "telefono" no existe en la base de datos. Reintentando sin ella...');
+        if (error.message.includes('phone_number') || error.code === '42703') {
+            console.warn('[createClient] La columna "phone_number" no existe en la base de datos. Reintentando sin ella...');
             const fallbackPayload = { ...payload };
-            delete fallbackPayload.telefono;
+            delete fallbackPayload.phone_number;
             
             const { data: retryData, error: retryError } = await supabase
                 .from('clientes')
-                .upsert([fallbackPayload], { onConflict: 'cedula' })
+                .upsert([fallbackPayload], { onConflict: 'tax_id' })
                 .select();
                 
             if (retryError) {

@@ -88,12 +88,12 @@ export const renderClientsPage = () => {
  * Renderiza una sola fila de cliente en la tabla
  */
 export const renderClientRow = (client) => {
-    const telefono = client.telefono || '<span class="text-slate-600 font-normal">NO REGISTRADO</span>';
-    const direccion = client.direccion || '<span class="text-slate-600 font-normal">NO REGISTRADO</span>';
-    const nombreCompleto = `${client.nombre} ${client.apellido || ''}`.trim();
+    const telefono = client.phone_number || '<span class="text-slate-600 font-normal">NO REGISTRADO</span>';
+    const direccion = client.address || '<span class="text-slate-600 font-normal">NO REGISTRADO</span>';
+    const nombreCompleto = `${client.first_name} ${client.last_name || ''}`.trim();
     
     // Normalizar y formatear documento de identidad
-    let displayCedula = client.cedula || '';
+    let displayCedula = client.tax_id || '';
     let raw = String(displayCedula).toUpperCase().trim();
     if (/^\d+$/.test(raw)) raw = `V-${raw}`; // Asumir V- si solo son números
     

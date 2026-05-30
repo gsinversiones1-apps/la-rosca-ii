@@ -10,14 +10,14 @@ export const useCart = () => {
         const globalProduct = GlobalState.allProducts.find(p => p.id === product.id);
         
         if (existingItem) {
-            if (globalProduct && globalProduct.stock > 0) {
+            if (globalProduct && globalProduct.stock_quantity > 0) {
                 existingItem.cantidad++;
-                globalProduct.stock--; // Descuento visual en tiempo real
+                globalProduct.stock_quantity--; // Descuento visual en tiempo real
             }
         } else {
-            if (globalProduct && globalProduct.stock > 0) {
+            if (globalProduct && globalProduct.stock_quantity > 0) {
                 GlobalState.cart.push({ ...product, cantidad: 1 });
-                globalProduct.stock--; // Descuento visual en tiempo real
+                globalProduct.stock_quantity--; // Descuento visual en tiempo real
             }
         }
         
@@ -36,7 +36,7 @@ export const useCart = () => {
             }
             // Devolver stock visualmente
             if (globalProduct) {
-                globalProduct.stock++;
+                globalProduct.stock_quantity++;
             }
         }
         updateState('cart', [...GlobalState.cart]);
@@ -47,14 +47,14 @@ export const useCart = () => {
         GlobalState.cart.forEach(cartItem => {
             const globalProduct = GlobalState.allProducts.find(p => p.id === cartItem.id);
             if (globalProduct) {
-                globalProduct.stock += cartItem.cantidad;
+                globalProduct.stock_quantity += cartItem.cantidad;
             }
         });
         updateState('cart', []);
     };
 
     const calculateTotals = (tasa, metodoPago = 'PAGO MOVIL') => {
-        const subtotal = GlobalState.cart.reduce((acc, item) => acc + (item.precio_usd * item.cantidad), 0);
+        const subtotal = GlobalState.cart.reduce((acc, item) => acc + (item.base_price * item.cantidad), 0);
         const iva = subtotal * (GlobalState.config.iva / 100);
         
         let igtf = 0;

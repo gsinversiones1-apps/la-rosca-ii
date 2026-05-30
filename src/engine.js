@@ -231,10 +231,10 @@ function getMatchScore(product, queryTerms) {
     let totalScore = 0;
     const normalize = (val) => (val || '').toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
     
-    const name = normalize(product.nombre);
-    const sku = normalize(product.codigo_skv);
-    const area = normalize(product.area);
-    const medida = normalize(product.medida);
+    const name = normalize(product.name);
+    const sku = normalize(product.sku);
+    const area = normalize(product.category);
+    const medida = normalize(product.uom);
     
     for (const term of queryTerms) {
         let termScore = 0;
@@ -288,7 +288,7 @@ const applyFilters = () => {
     if (category !== 'all') {
         const lowerCat = category.toLowerCase().trim();
         filteredProducts = filteredProducts.filter(p => 
-            p.area && p.area.toLowerCase().trim() === lowerCat
+            p.category && p.category.toLowerCase().trim() === lowerCat
         );
     }
 
@@ -437,14 +437,14 @@ export function updateClientsKPIs() {
     totalEl.innerText = clients.length;
     
     const juridicos = clients.filter(c => {
-        let ced = c && c.cedula ? String(c.cedula).toUpperCase().trim() : '';
+        let ced = c && c.tax_id ? String(c.tax_id).toUpperCase().trim() : '';
         if (/^\d+$/.test(ced)) ced = `V-${ced}`;
         return ced.startsWith('J-') || ced.startsWith('J') || ced.startsWith('G-') || ced.startsWith('G');
     }).length;
     juridicosEl.innerText = juridicos;
     
     const naturales = clients.filter(c => {
-        let ced = c && c.cedula ? String(c.cedula).toUpperCase().trim() : '';
+        let ced = c && c.tax_id ? String(c.tax_id).toUpperCase().trim() : '';
         if (/^\d+$/.test(ced)) ced = `V-${ced}`;
         const isJ = ced.startsWith('J-') || ced.startsWith('J') || ced.startsWith('G-') || ced.startsWith('G');
         return !isJ;
@@ -778,7 +778,7 @@ async function handleCheckout(isConsumidorFinal = false) {
             if (newClientForm && !newClientForm.classList.contains('hidden')) {
                 const formData = new FormData(newClientForm);
                 const clientData = Object.fromEntries(formData.entries());
-                if (clientData.nombre && clientData.rif) {
+                if (clientData.first_name && clientData.tax_id) {
                     const newClient = await createClient(clientData);
                     const updatedClients = await getClients();
                     updateState('allClients', updatedClients);
@@ -819,8 +819,8 @@ async function handleCheckout(isConsumidorFinal = false) {
         
         // --- INICIO INTEGRACIÓN FISCAL DRIVER ---
         const payloadFiscal = {
-            cliente: isConsumidorFinal ? "CONSUMIDOR FINAL" : (GlobalState.currentClient.nombre + " " + (GlobalState.currentClient.apellido || '')).trim(),
-            cedula_rif: isConsumidorFinal ? "V00000000" : GlobalState.currentClient.cedula,
+            cliente: isConsumidorFinal ? "CONSUMIDOR FINAL" : (GlobalState.currentClient.first_name + " " + (GlobalState.currentClient.last_name || '')).trim(),
+            cedula_rif: isConsumidorFinal ? "V00000000" : GlobalState.currentClient.tax_id,
             pagoDivisas: totals.totalUsd,
             pagoBs: totals.totalBs,
             metodoPago: totals.metodoPago,
@@ -1052,11 +1052,11 @@ function setupGlobalEvents() {
                 const form = document.getElementById('form-add-product');
                 if (form) form.reset();
                 
-                document.getElementById('add-prod-sku').value = product.codigo_skv || '';
-                document.getElementById('add-prod-area').value = product.area || 'General';
-                document.getElementById('add-prod-nombre').value = product.nombre || '';
-                document.getElementById('add-prod-precio').value = product.precio_usd || 0;
-                document.getElementById('add-prod-stock').value = product.stock || 0;
+                document.getElementById('add-prod-sku').value = product.sku || '';
+                document.getElementById('add-prod-area').value = product.category || 'General';
+                document.getElementById('add-prod-nombre').value = product.name || '';
+                document.getElementById('add-prod-precio').value = product.base_price || 0;
+                document.getElementById('add-prod-stock').value = product.stock_quantity || 0;
                 document.getElementById('add-prod-image').value = product.image_url || '';
                 
                 const title = document.getElementById('modal-product-title');
@@ -1172,8 +1172,8 @@ function setupGlobalEvents() {
             const client = GlobalState.allClients.find(c => c.id == clientId);
             if (client) {
                 updateState('currentClient', client);
-                document.getElementById('checkout-selected-name').innerText = (client.nombre + ' ' + (client.apellido || '')).trim();
-                document.getElementById('checkout-selected-rif').innerText = client.cedula || '';
+                document.getElementById('checkout-selected-name').innerText = (client.first_name + ' ' + (client.last_name || '')).trim();
+                document.getElementById('checkout-selected-rif').innerText = client.tax_id || '';
                 document.getElementById('checkout-selected-client-box').classList.remove('hidden');
                 document.getElementById('checkout-client-search').parentElement.classList.add('hidden');
                 document.getElementById('checkout-client-results').classList.add('hidden');
@@ -1234,10 +1234,10 @@ function setupGlobalEvents() {
         if (e.target.id === 'clients-search-input') {
             const query = e.target.value.toLowerCase().trim();
             const filtered = GlobalState.allClients.filter(c => 
-                (c.nombre && c.nombre.toLowerCase().includes(query)) || 
-                (c.apellido && c.apellido.toLowerCase().includes(query)) ||
-                (c.cedula && c.cedula.toLowerCase().includes(query)) ||
-                (c.telefono && c.telefono.toLowerCase().includes(query))
+                (c.first_name && c.first_name.toLowerCase().includes(query)) || 
+                (c.last_name && c.last_name.toLowerCase().includes(query)) ||
+                (c.tax_id && c.tax_id.toLowerCase().includes(query)) ||
+                (c.phone_number && c.phone_number.toLowerCase().includes(query))
             );
             renderClientsTable(filtered);
         }
@@ -1252,9 +1252,9 @@ function setupGlobalEvents() {
             }
 
             const matches = GlobalState.allClients.filter(c => 
-                (c.nombre && c.nombre.toLowerCase().includes(query)) || 
-                (c.apellido && c.apellido.toLowerCase().includes(query)) ||
-                (c.cedula && c.cedula.toLowerCase().includes(query))
+                (c.first_name && c.first_name.toLowerCase().includes(query)) || 
+                (c.last_name && c.last_name.toLowerCase().includes(query)) ||
+                (c.tax_id && c.tax_id.toLowerCase().includes(query))
             );
 
             resultsContainer.innerHTML = '';
@@ -1264,8 +1264,8 @@ function setupGlobalEvents() {
                     resultsContainer.innerHTML += `
                         <div class="checkout-client-option p-3 border-b border-industrial-gray hover:bg-white/5 cursor-pointer flex justify-between items-center" data-id="${m.id}">
                             <div>
-                                <p class="text-[10px] font-black text-white uppercase">${m.nombre} ${m.apellido || ''}</p>
-                                <p class="text-[9px] font-bold text-gold uppercase">${m.cedula || ''}</p>
+                                <p class="text-[10px] font-black text-white uppercase">${m.first_name} ${m.last_name || ''}</p>
+                                <p class="text-[9px] font-bold text-gold uppercase">${m.tax_id || ''}</p>
                             </div>
                         </div>
                     `;
@@ -1319,12 +1319,12 @@ function setupGlobalEvents() {
             saveBtn.disabled = true;
 
             const productPayload = {
-                codigo_skv: document.getElementById('add-prod-sku').value.toUpperCase(),
-                nombre: document.getElementById('add-prod-nombre').value.toUpperCase(),
-                area: document.getElementById('add-prod-area').value,
-                medida: 'N/A', // O podríamos agregarlo al form
-                precio_usd: parseFloat(document.getElementById('add-prod-precio').value),
-                stock: parseInt(document.getElementById('add-prod-stock').value, 10)
+                sku: document.getElementById('add-prod-sku').value.toUpperCase(),
+                name: document.getElementById('add-prod-nombre').value.toUpperCase(),
+                category: document.getElementById('add-prod-area').value,
+                uom: 'N/A', // O podríamos agregarlo al form
+                base_price: parseFloat(document.getElementById('add-prod-precio').value),
+                stock_quantity: parseInt(document.getElementById('add-prod-stock').value, 10)
             };
 
             try {

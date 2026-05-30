@@ -10,9 +10,9 @@ export const renderCartItem = (item) => {
             <img src="${item.image_url || '/assets/tornillo_tuerca_4k.png'}" class="w-full h-full object-cover opacity-70"/>
         </div>
         <div class="flex-1">
-            <h4 class="text-[10px] font-bold text-white uppercase truncate">${item.nombre}</h4>
+            <h4 class="text-[10px] font-bold text-white uppercase truncate">${item.name}</h4>
             <div class="flex justify-between items-center mt-1">
-                <span class="text-[9px] text-gold font-mono font-bold">$${formatCurrency(item.precio_usd)}</span>
+                <span class="text-[9px] text-gold font-mono font-bold">$${formatCurrency(item.base_price)}</span>
                 <div class="flex items-center gap-2">
                     <button class="remove-item text-slate-500 hover:text-red-500" data-id="${item.id}">
                         <span class="material-symbols-outlined text-xs">remove_circle</span>
