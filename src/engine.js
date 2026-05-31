@@ -429,7 +429,7 @@ export function navigate(page) {
             datalist.innerHTML = uniqueCategories.map(cat => `<option value="${cat}">`).join('');
         }
     } else if (page === 'dashboard') {
-        contentArea.innerHTML = renderDashboardPage(GlobalState.userRole);
+        contentArea.innerHTML = renderDashboardPage(GlobalState.storeName, GlobalState.userRole);
         loadDashboardData();
     } else if (page === 'clients') {
         contentArea.innerHTML = renderClientsPage();

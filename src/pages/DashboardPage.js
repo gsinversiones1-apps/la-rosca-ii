@@ -1,4 +1,4 @@
-export const renderDashboardPage = (userRole = 'vendedor') => {
+export const renderDashboardPage = (storeName = "GLOBAL POS", userRole = 'vendedor') => {
     const isAdmin = userRole === 'admin';
 
     return `
@@ -13,7 +13,7 @@ export const renderDashboardPage = (userRole = 'vendedor') => {
                     <div class="flex items-center gap-3.5 mb-1 pb-1">
                         <span class="material-symbols-outlined text-3xl text-gold drop-shadow-[0_0_8px_rgba(212,175,55,0.4)] animate-pulse">radar</span>
                         <h2 class="font-headline text-2xl font-black text-white uppercase tracking-wider flex items-center gap-2 flex-wrap">
-                            Centro de Mando Estratégico <span class="bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] via-[#B38728] via-[#FBF5B7] to-[#AA771C] bg-clip-text text-transparent drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">360º LA ROSCA II</span>
+                            Centro de Mando Estratégico <span class="bg-gradient-to-r from-[#BF953F] via-[#FCF6BA] via-[#B38728] via-[#FBF5B7] to-[#AA771C] bg-clip-text text-transparent drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]">360º ${storeName}</span>
                         </h2>
                     </div>
                     <p class="text-[11px] text-slate-400 font-bold uppercase tracking-wider pl-11">
