@@ -353,10 +353,7 @@ export function navigate(page) {
         return;
     }
 
-    if (page === 'dashboard' && GlobalState.userRole !== 'admin') {
-        alert("Acceso denegado. Se requiere perfil de Administrador para ver el Dashboard.");
-        page = 'pos';
-    }
+    // Guard removido para permitir a todos ver el Dashboard (KPIs sensibles se ocultan internamente)
 
     // Limpiar input de búsqueda al cambiar de vista
     const searchInput = document.getElementById('search-input');
