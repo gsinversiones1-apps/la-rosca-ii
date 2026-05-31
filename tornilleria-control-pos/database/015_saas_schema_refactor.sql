@@ -1,93 +1,105 @@
 -- ==============================================================================
--- MIGRACIÓN DE ESQUEMA SAAS GLOBAL MULTI-TENANT
--- Este script adapta la base de datos a estándares internacionales.
--- IMPORTANTE: Ejecutar en el SQL Editor de Supabase.
+-- SCRIPT 1 (VERSIÓN DEFINITIVA CON DYNAMIC SQL)
 -- ==============================================================================
 
--- Habilitar extensión para generar UUIDs si no está habilitada
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- ------------------------------------------------------------------------------
--- 1. RENOMBRADO DE COLUMNAS - TABLA: PRODUCTOS
--- ------------------------------------------------------------------------------
--- Eliminamos el check constraint restrictivo de la categoría (Ferreteria, etc.)
-ALTER TABLE productos DROP CONSTRAINT IF EXISTS productos_area_check;
+DO $$
+BEGIN
+  -- Intentar eliminar el constraint si existe (se ignora si no existe)
+  BEGIN
+    ALTER TABLE productos DROP CONSTRAINT productos_area_check;
+  EXCEPTION
+    WHEN undefined_object THEN null;
+  END;
+END $$;
 
--- Renombramos columnas a nombres estándar SaaS
-ALTER TABLE productos 
-  RENAME COLUMN codigo_skv TO sku;
+DO $$ 
+BEGIN 
+  -- ------------------------------------------------------------------------------
+  -- 1. TABLA PRODUCTOS
+  -- ------------------------------------------------------------------------------
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='productos' AND column_name='codigo_skv') THEN
+      EXECUTE 'ALTER TABLE productos RENAME COLUMN codigo_skv TO sku';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='productos' AND column_name='nombre') THEN
+      EXECUTE 'ALTER TABLE productos RENAME COLUMN nombre TO name';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='productos' AND column_name='area') THEN
+      EXECUTE 'ALTER TABLE productos RENAME COLUMN area TO category';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='productos' AND column_name='medida') THEN
+      EXECUTE 'ALTER TABLE productos RENAME COLUMN medida TO uom';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='productos' AND column_name='stock') THEN
+      EXECUTE 'ALTER TABLE productos RENAME COLUMN stock TO stock_quantity';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='productos' AND column_name='stock_minimo') THEN
+      EXECUTE 'ALTER TABLE productos RENAME COLUMN stock_minimo TO min_stock_level';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='productos' AND column_name='precio_usd') THEN
+      EXECUTE 'ALTER TABLE productos RENAME COLUMN precio_usd TO base_price';
+  END IF;
 
-ALTER TABLE productos 
-  RENAME COLUMN nombre TO name;
+  -- ------------------------------------------------------------------------------
+  -- 2. TABLA CLIENTES
+  -- ------------------------------------------------------------------------------
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='clientes' AND column_name='cedula') THEN
+      EXECUTE 'ALTER TABLE clientes RENAME COLUMN cedula TO tax_id';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='clientes' AND column_name='nombre') THEN
+      EXECUTE 'ALTER TABLE clientes RENAME COLUMN nombre TO first_name';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='clientes' AND column_name='apellido') THEN
+      EXECUTE 'ALTER TABLE clientes RENAME COLUMN apellido TO last_name';
+  END IF;
+  
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='clientes' AND column_name='direccion') THEN
+      EXECUTE 'ALTER TABLE clientes RENAME COLUMN direccion TO address';
+  ELSE
+      IF NOT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='clientes' AND column_name='address') THEN
+          EXECUTE 'ALTER TABLE clientes ADD COLUMN address TEXT';
+      END IF;
+  END IF;
+  
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='clientes' AND column_name='telefono') THEN
+      EXECUTE 'ALTER TABLE clientes RENAME COLUMN telefono TO phone_number';
+  ELSE
+      IF NOT EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='clientes' AND column_name='phone_number') THEN
+          EXECUTE 'ALTER TABLE clientes ADD COLUMN phone_number TEXT';
+      END IF;
+  END IF;
 
-ALTER TABLE productos 
-  RENAME COLUMN area TO category;
+  -- ------------------------------------------------------------------------------
+  -- 3. TABLA VENTAS
+  -- ------------------------------------------------------------------------------
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='ventas' AND column_name='producto_id') THEN
+      EXECUTE 'ALTER TABLE ventas RENAME COLUMN producto_id TO product_id';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='ventas' AND column_name='cantidad') THEN
+      EXECUTE 'ALTER TABLE ventas RENAME COLUMN cantidad TO quantity';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='ventas' AND column_name='tasa_dia') THEN
+      EXECUTE 'ALTER TABLE ventas RENAME COLUMN tasa_dia TO exchange_rate';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='ventas' AND column_name='total_bs') THEN
+      EXECUTE 'ALTER TABLE ventas RENAME COLUMN total_bs TO total_local_currency';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='ventas' AND column_name='total_usd') THEN
+      EXECUTE 'ALTER TABLE ventas RENAME COLUMN total_usd TO total_amount';
+  END IF;
+  IF EXISTS(SELECT 1 FROM information_schema.columns WHERE table_name='ventas' AND column_name='fecha_venta') THEN
+      EXECUTE 'ALTER TABLE ventas RENAME COLUMN fecha_venta TO created_at';
+  END IF;
+END $$;
 
-ALTER TABLE productos 
-  RENAME COLUMN medida TO uom;
+-- Añadimos columnas de tracking si no existen
+ALTER TABLE productos ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+ALTER TABLE productos ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+ALTER TABLE clientes ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+ALTER TABLE clientes ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
 
-ALTER TABLE productos 
-  RENAME COLUMN stock TO stock_quantity;
-
-ALTER TABLE productos 
-  RENAME COLUMN stock_minimo TO min_stock_level;
-
-ALTER TABLE productos 
-  RENAME COLUMN precio_usd TO base_price;
-
--- Añadimos columnas estándar de tracking
-ALTER TABLE productos 
-  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
-
--- ------------------------------------------------------------------------------
--- 2. RENOMBRADO DE COLUMNAS - TABLA: CLIENTES
--- ------------------------------------------------------------------------------
-ALTER TABLE clientes 
-  RENAME COLUMN cedula TO tax_id;
-
-ALTER TABLE clientes 
-  RENAME COLUMN nombre TO first_name;
-
-ALTER TABLE clientes 
-  RENAME COLUMN apellido TO last_name;
-
-ALTER TABLE clientes 
-  RENAME COLUMN direccion TO address;
-
-ALTER TABLE clientes 
-  RENAME COLUMN telefono TO phone_number;
-
-ALTER TABLE clientes 
-  ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
-
--- ------------------------------------------------------------------------------
--- 3. RENOMBRADO DE COLUMNAS - TABLA: VENTAS
--- ------------------------------------------------------------------------------
-ALTER TABLE ventas 
-  RENAME COLUMN producto_id TO product_id;
-
-ALTER TABLE ventas 
-  RENAME COLUMN cantidad TO quantity;
-
-ALTER TABLE ventas 
-  RENAME COLUMN tasa_dia TO exchange_rate;
-
-ALTER TABLE ventas 
-  RENAME COLUMN total_bs TO total_local_currency;
-
--- total_usd lo vamos a llamar total_amount (si la base de la DB es USD)
-ALTER TABLE ventas 
-  RENAME COLUMN total_usd TO total_amount;
-
-ALTER TABLE ventas 
-  RENAME COLUMN fecha_venta TO created_at;
-
--- ------------------------------------------------------------------------------
--- 4. ACTUALIZACIÓN DEL TRIGGER DE STOCK AUTOMÁTICO
--- ------------------------------------------------------------------------------
--- Actualizamos la función que usa los nombres viejos
+-- Recrear el Trigger de Stock
 CREATE OR REPLACE FUNCTION descontar_stock()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -97,13 +109,3 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-
--- ------------------------------------------------------------------------------
--- NOTA SOBRE MIGRACIÓN A UUID PRIMARY KEYS:
--- Actualmente las tablas usan 'id SERIAL'. Para migrar las primary keys 
--- y sus foreign keys a UUID en producción se requiere un proceso de 5 pasos 
--- (crear nueva columna, propagar UUIDs, recrear constraints y renombrar).
--- Por seguridad de los datos actuales, este script prioriza la estandarización
--- semántica de columnas. La migración a UUID en primary keys de productos/clientes
--- puede realizarse como una fase 2 si la DB está vacía o recién iniciando.
--- ------------------------------------------------------------------------------
