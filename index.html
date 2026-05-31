@@ -19,11 +19,11 @@
                         '2xl': '1400px', // Custom 1400px breakpoint
                     },
                     colors: {
-                        background: '#0D1117',
-                        navy: '#1B263B',
-                        gold: '#D4AF37',
-                        'dark-gray': '#24292E',
-                        'industrial-gray': '#30363D'
+                        background: '#000000',
+                        navy: '#0A0A0A',
+                        gold: '#FF5A00',
+                        'dark-gray': '#141414',
+                        'industrial-gray': '#262626'
                     },
                     fontFamily: {
                         mono: ['"Roboto Mono"', 'ui-monospace', 'monospace'],
@@ -50,34 +50,34 @@
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: var(--color-background, #0D1117); 
+            background-color: var(--color-background, #000000); 
             color: #E6EDF3; 
             font-size: var(--font-size-base);
         }
         
         /* Reemplazo de utilidades antiguas por las de Tailwind Config */
-        .bg-navy { background-color: #1B263B; }
-        .text-gold { color: #D4AF37; }
-        .bg-gold { background-color: #D4AF37; }
-        .border-gold { border-color: #D4AF37; }
-        .bg-dark-gray { background-color: #24292E; }
-        .border-industrial-gray { border-color: #30363D; }
+        .bg-navy { background-color: #0A0A0A; }
+        .text-gold { color: #FF5A00; }
+        .bg-gold { background-color: #FF5A00; }
+        .border-gold { border-color: #FF5A00; }
+        .bg-dark-gray { background-color: #141414; }
+        .border-industrial-gray { border-color: #262626; }
         
         /* Estilos de Componentes Premium (Look & Feel) */
         
-        /* Botón Dorado Metálico Pulido Premium */
+        /* Botón Naranja Brillante Premium (Mantiene clase gold por compatibilidad JS) */
         .btn-gold-premium {
-            background: linear-gradient(135deg, #BF953F 0%, #FCF6BA 25%, #B38728 50%, #FBF5B7 75%, #AA771C 100%);
+            background: linear-gradient(135deg, #FF3D00 0%, #FF8A00 25%, #FF5A00 50%, #FFA750 75%, #E04000 100%);
             background-size: 200% auto;
-            color: #0D1117 !important;
+            color: #000000 !important;
             font-weight: 800;
             border-radius: 12px;
-            border: 1px solid rgba(212, 175, 55, 0.4);
+            border: 1px solid rgba(255, 90, 0, 0.4);
             box-shadow: 
                 0 4px 6px -1px rgba(0, 0, 0, 0.3), 
                 0 2px 4px -1px rgba(0, 0, 0, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.4),
-                0 0 0 1px rgba(212, 175, 55, 0.15);
+                0 0 0 1px rgba(255, 90, 0, 0.15);
             text-shadow: 0 0.5px 0.5px rgba(255, 255, 255, 0.25);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -87,12 +87,12 @@
         .btn-gold-premium:hover {
             background-position: right center;
             box-shadow: 
-                0 8px 16px -4px rgba(212, 175, 55, 0.35), 
-                0 4px 6px -2px rgba(212, 175, 55, 0.2),
+                0 8px 16px -4px rgba(255, 90, 0, 0.35), 
+                0 4px 6px -2px rgba(255, 90, 0, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.5),
-                0 0 0 2px rgba(212, 175, 55, 0.4);
+                0 0 0 2px rgba(255, 90, 0, 0.4);
             transform: translateY(-1.5px);
-            filter: brightness(1.03);
+            filter: brightness(1.05);
         }
         
         .btn-gold-premium:active {
@@ -102,23 +102,23 @@
                 inset 0 2px 4px rgba(0, 0, 0, 0.15);
         }
         
-        /* Contenedor Azul Marino Premium */
+        /* Contenedor Negro Premium */
         .bg-navy-premium {
-            background: linear-gradient(145deg, #1A253C, #0F1626);
-            border: 1px solid rgba(212, 175, 55, 0.12);
+            background: linear-gradient(145deg, #111111, #050505);
+            border: 1px solid rgba(255, 90, 0, 0.12);
             box-shadow: 
-                0 10px 25px -5px rgba(0, 0, 0, 0.45), 
-                0 8px 10px -6px rgba(0, 0, 0, 0.35),
-                inset 0 1px 1px rgba(255, 255, 255, 0.05);
+                0 10px 25px -5px rgba(0, 0, 0, 0.55), 
+                0 8px 10px -6px rgba(0, 0, 0, 0.45),
+                inset 0 1px 1px rgba(255, 255, 255, 0.03);
             border-radius: 14px;
         }
 
-        /* Hover de brillo dorado metálico sutil para tarjetas */
+        /* Hover de brillo naranja sutil para tarjetas */
         .hover-gold-glow:hover {
-            border-color: rgba(212, 175, 55, 0.4);
+            border-color: rgba(255, 90, 0, 0.4);
             box-shadow: 
                 0 10px 25px -5px rgba(0, 0, 0, 0.5), 
-                0 0 15px rgba(212, 175, 55, 0.1);
+                0 0 15px rgba(255, 90, 0, 0.1);
         }
 
         /* Utilidades de Componentes Atómicos (Nivel 2) */
@@ -136,10 +136,10 @@
         .table-responsive-wrapper::-webkit-scrollbar-track { background: transparent; }
         
         .custom-scrollbar::-webkit-scrollbar-thumb,
-        .table-responsive-wrapper::-webkit-scrollbar-thumb { background: #30363D; border-radius: 3px; }
+        .table-responsive-wrapper::-webkit-scrollbar-thumb { background: #262626; border-radius: 3px; }
         
         .custom-scrollbar::-webkit-scrollbar-thumb:hover,
-        .table-responsive-wrapper::-webkit-scrollbar-thumb:hover { background: #D4AF37; }
+        .table-responsive-wrapper::-webkit-scrollbar-thumb:hover { background: #FF5A00; }
         
         #search-input {
             color: #000000 !important;
