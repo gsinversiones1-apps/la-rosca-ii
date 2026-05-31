@@ -6,10 +6,15 @@ export const renderLoginPage = () => {
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-gold to-transparent"></div>
             
             <div class="text-center mb-8">
+                <div class="flex justify-center mb-4">
+                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-gold/20 to-gold/5 flex items-center justify-center border border-gold/30 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+                        <span class="material-symbols-outlined text-gold text-4xl">storefront</span>
+                    </div>
+                </div>
                 <h1 class="text-3xl font-black text-white font-headline uppercase tracking-widest mb-2">
-                    TORNILLERÍA <span class="text-gold">LA ROSCA II</span>
+                    SaaS <span class="text-gold">MASTER</span>
                 </h1>
-                <p class="text-xs text-slate-400 font-bold tracking-widest uppercase">Sistema de Gestión (SaaS)</p>
+                <p class="text-xs text-slate-400 font-bold tracking-widest uppercase">Portal de Administración</p>
             </div>
 
             <form id="login-form" class="space-y-6">
@@ -19,7 +24,7 @@ export const renderLoginPage = () => {
                         <span class="material-symbols-outlined absolute left-3 top-3 text-slate-500">mail</span>
                         <input type="email" id="login-email" required
                             class="w-full bg-dark-gray border border-industrial-gray text-white px-10 py-3 focus:outline-none focus:border-gold transition-colors font-bold text-sm"
-                            placeholder="admin@larosca.com"
+                            placeholder="admin@tunegocio.com"
                         >
                     </div>
                 </div>
@@ -48,14 +53,14 @@ export const renderLoginPage = () => {
 
                 <button type="submit" id="btn-login-submit"
                     class="w-full btn-gold-premium py-4 text-xs font-black uppercase tracking-[0.1em] shadow-lg active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2">
-                    <span>INICIAR SESIÓN</span>
+                    <span>ACCEDER AL SISTEMA</span>
                     <span class="material-symbols-outlined text-sm font-black">login</span>
                 </button>
             </form>
             
             <div class="mt-6 text-center">
                 <p class="text-[9px] text-slate-500 uppercase tracking-widest font-mono">
-                    Protegido por Supabase Auth
+                    Arquitectura Multi-Tenant • Seguridad RLS
                 </p>
             </div>
         </div>

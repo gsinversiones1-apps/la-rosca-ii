@@ -77,6 +77,9 @@ async function initApp() {
         try {
             const profile = await getUserProfile(session.user.id);
             updateState('userRole', profile.rol);
+            if (profile.tenants && profile.tenants.business_name) {
+                updateState('storeName', profile.tenants.business_name);
+            }
         } catch (err) {
             console.error('Error cargando perfil:', err);
             updateState('userRole', 'vendedor'); // Default seguro
