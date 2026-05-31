@@ -6,11 +6,9 @@
 export const renderSidebar = (storeName = "GLOBAL POS", userRole = 'vendedor') => {
     const isAdmin = userRole === 'admin';
     
-    const dashboardButton = isAdmin 
-        ? `<button id="nav-dashboard" class="w-full text-left text-slate-400 px-4 md:px-0 2xl:px-4 py-3 flex items-center justify-start md:justify-center 2xl:justify-start gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all" title="Panel Principal">
+    const dashboardButton = `<button id="nav-dashboard" class="w-full text-left text-slate-400 px-4 md:px-0 2xl:px-4 py-3 flex items-center justify-start md:justify-center 2xl:justify-start gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all" title="Panel Principal">
                 <span class="material-symbols-outlined">dashboard</span> <span class="inline md:hidden 2xl:inline">Panel Principal</span>
-           </button>`
-        : '';
+           </button>`;
 
     const settingsButton = isAdmin 
         ? `<a id="btn-open-settings" class="text-slate-400 px-4 md:px-0 2xl:px-4 py-3 flex items-center justify-start md:justify-center 2xl:justify-start gap-3 font-headline text-xs font-bold uppercase hover:bg-white/5 hover:text-gold transition-all mt-10 cursor-pointer" title="Configuración">
