@@ -16,12 +16,12 @@
                         'md': '768px',
                         'lg': '1024px',
                         'xl': '1280px',
-                        '2xl': '1400px', // Custom 1400px breakpoint
+                        '2xl': '1400px',
                     },
                     colors: {
-                        background: '#000000',
-                        navy: '#0A0A0A',
-                        gold: '#FF5A00',
+                        background: 'var(--theme-bg, #000000)',
+                        navy: 'var(--theme-secondary, #0A0A0A)',
+                        gold: 'var(--theme-primary, #FF5A00)',
                         'dark-gray': '#141414',
                         'industrial-gray': '#262626'
                     },
@@ -46,38 +46,43 @@
             --font-size-lg: clamp(1rem, 1.2vw + 0.6rem, 1.125rem);
             --font-size-xl: clamp(1.125rem, 1.5vw + 0.8rem, 1.25rem);
             --spacing-base: clamp(1rem, 2vw, 1.5rem);
+
+            /* Tema dinámico (White-Labeling) - Defaults de La Rosca II */
+            --theme-primary: #FF5A00;
+            --theme-secondary: #0A0A0A;
+            --theme-bg: #000000;
         }
         
         body { 
             font-family: 'Inter', sans-serif; 
-            background-color: var(--color-background, #000000); 
+            background-color: var(--theme-bg, #000000); 
             color: #E6EDF3; 
             font-size: var(--font-size-base);
         }
         
         /* Reemplazo de utilidades antiguas por las de Tailwind Config */
-        .bg-navy { background-color: #0A0A0A; }
-        .text-gold { color: #FF5A00; }
-        .bg-gold { background-color: #FF5A00; }
-        .border-gold { border-color: #FF5A00; }
+        .bg-navy { background-color: var(--theme-secondary, #0A0A0A); }
+        .text-gold { color: var(--theme-primary, #FF5A00); }
+        .bg-gold { background-color: var(--theme-primary, #FF5A00); }
+        .border-gold { border-color: var(--theme-primary, #FF5A00); }
         .bg-dark-gray { background-color: #141414; }
         .border-industrial-gray { border-color: #262626; }
         
         /* Estilos de Componentes Premium (Look & Feel) */
         
-        /* Botón Naranja Brillante Premium (Mantiene clase gold por compatibilidad JS) */
+        /* Botón Brillante Premium (Mantiene clase gold por compatibilidad JS) */
         .btn-gold-premium {
-            background: linear-gradient(135deg, #FF3D00 0%, #FF8A00 25%, #FF5A00 50%, #FFA750 75%, #E04000 100%);
+            background: linear-gradient(135deg, var(--theme-primary-light, #FF8A00) 0%, var(--theme-primary, #FF5A00) 50%, var(--theme-primary-dark, #E04000) 100%);
             background-size: 200% auto;
-            color: #000000 !important;
+            color: var(--theme-text-on-primary, #000000) !important;
             font-weight: 800;
             border-radius: 12px;
-            border: 1px solid rgba(255, 90, 0, 0.4);
+            border: 1px solid var(--theme-primary-alpha-40, rgba(255, 90, 0, 0.4));
             box-shadow: 
                 0 4px 6px -1px rgba(0, 0, 0, 0.3), 
                 0 2px 4px -1px rgba(0, 0, 0, 0.2),
                 inset 0 1px 0 rgba(255, 255, 255, 0.4),
-                0 0 0 1px rgba(255, 90, 0, 0.15);
+                0 0 0 1px var(--theme-primary-alpha-15, rgba(255, 90, 0, 0.15));
             text-shadow: 0 0.5px 0.5px rgba(255, 255, 255, 0.25);
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -87,10 +92,10 @@
         .btn-gold-premium:hover {
             background-position: right center;
             box-shadow: 
-                0 8px 16px -4px rgba(255, 90, 0, 0.35), 
-                0 4px 6px -2px rgba(255, 90, 0, 0.2),
+                0 8px 16px -4px var(--theme-primary-alpha-35, rgba(255, 90, 0, 0.35)), 
+                0 4px 6px -2px var(--theme-primary-alpha-20, rgba(255, 90, 0, 0.2)),
                 inset 0 1px 0 rgba(255, 255, 255, 0.5),
-                0 0 0 2px rgba(255, 90, 0, 0.4);
+                0 0 0 2px var(--theme-primary-alpha-40, rgba(255, 90, 0, 0.4));
             transform: translateY(-1.5px);
             filter: brightness(1.05);
         }
@@ -102,10 +107,10 @@
                 inset 0 2px 4px rgba(0, 0, 0, 0.15);
         }
         
-        /* Contenedor Negro Premium */
+        /* Contenedor Oscuro Premium */
         .bg-navy-premium {
-            background: linear-gradient(145deg, #111111, #050505);
-            border: 1px solid rgba(255, 90, 0, 0.12);
+            background: linear-gradient(145deg, var(--theme-bg-gradient-start, #111111), var(--theme-bg-gradient-end, #050505));
+            border: 1px solid var(--theme-primary-alpha-12, rgba(255, 90, 0, 0.12));
             box-shadow: 
                 0 10px 25px -5px rgba(0, 0, 0, 0.55), 
                 0 8px 10px -6px rgba(0, 0, 0, 0.45),
@@ -113,12 +118,12 @@
             border-radius: 14px;
         }
 
-        /* Hover de brillo naranja sutil para tarjetas */
+        /* Hover de brillo primario sutil para tarjetas */
         .hover-gold-glow:hover {
-            border-color: rgba(255, 90, 0, 0.4);
+            border-color: var(--theme-primary-alpha-40, rgba(255, 90, 0, 0.4));
             box-shadow: 
                 0 10px 25px -5px rgba(0, 0, 0, 0.5), 
-                0 0 15px rgba(255, 90, 0, 0.1);
+                0 8px 10px -6px var(--theme-primary-alpha-12, rgba(255, 90, 0, 0.12));
         }
 
         /* Utilidades de Componentes Atómicos (Nivel 2) */
@@ -169,7 +174,7 @@
     </div>
 
     <!-- CARGA DEFINITIVA DEL MOTOR SAAS -->
-    <script type="module" src="./src/engine.js?v=4.0.2"></script>
+    <script type="module" src="./src/engine.js?v=4.0.3"></script>
 
 </body>
 </html>

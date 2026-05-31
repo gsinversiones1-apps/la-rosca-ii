@@ -77,8 +77,37 @@ async function initApp() {
         try {
             const profile = await getUserProfile(session.user.id);
             updateState('userRole', profile.rol);
-            if (profile.tenants && profile.tenants.business_name) {
-                updateState('storeName', profile.tenants.business_name);
+            if (profile.tenants) {
+                if (profile.tenants.business_name) {
+                    updateState('storeName', profile.tenants.business_name);
+                }
+                // White-Labeling Theme Injection
+                if (profile.tenants.theme_primary) {
+                    const primary = profile.tenants.theme_primary;
+                    document.documentElement.style.setProperty('--theme-primary', primary);
+                    document.documentElement.style.setProperty('--theme-primary-light', primary);
+                    document.documentElement.style.setProperty('--theme-primary-dark', primary);
+                    
+                    // Hex to RGB Helper para las sombras (rgba)
+                    const hexToRgb = hex => {
+                        let c = hex.substring(1).split('');
+                        if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+                        c = '0x' + c.join('');
+                        return [(c>>16)&255, (c>>8)&255, c&255].join(', ');
+                    };
+                    const rgb = hexToRgb(primary);
+                    document.documentElement.style.setProperty('--theme-primary-alpha-40', `rgba(${rgb}, 0.4)`);
+                    document.documentElement.style.setProperty('--theme-primary-alpha-35', `rgba(${rgb}, 0.35)`);
+                    document.documentElement.style.setProperty('--theme-primary-alpha-20', `rgba(${rgb}, 0.2)`);
+                    document.documentElement.style.setProperty('--theme-primary-alpha-15', `rgba(${rgb}, 0.15)`);
+                    document.documentElement.style.setProperty('--theme-primary-alpha-12', `rgba(${rgb}, 0.12)`);
+                }
+                if (profile.tenants.theme_secondary) {
+                    const secondary = profile.tenants.theme_secondary;
+                    document.documentElement.style.setProperty('--theme-secondary', secondary);
+                    document.documentElement.style.setProperty('--theme-bg-gradient-start', secondary);
+                    document.documentElement.style.setProperty('--theme-bg-gradient-end', '#020617'); // Dark tailwind slate
+                }
             }
         } catch (err) {
             console.error('Error cargando perfil:', err);

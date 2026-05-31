@@ -28,7 +28,7 @@ export const getSession = async () => {
 export const getUserProfile = async (userId) => {
     const { data, error } = await supabase
         .from('perfiles')
-        .select('*, tenants(business_name)')
+        .select('*, tenants(business_name, theme_primary, theme_secondary)')
         .eq('user_id', userId)
         .single();
         
